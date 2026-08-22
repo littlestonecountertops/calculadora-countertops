@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Little Stone Countertops - Calculadora V2</title>
+<style>
+:root{--bg:#f4f5f7;--card:#fff;--text:#17202a;--muted:#6b7280;--line:#e5e7eb;--dark:#111827;--accent:#2563eb;--green:#15803d;--red:#dc2626}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+.container{max-width:1100px;margin:25px auto;padding:18px}.brand{text-align:center;margin-bottom:22px}.brand h1{margin:0;font-size:30px}.brand p{margin:6px 0;color:var(--muted)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.full{grid-column:1/-1}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 5px 18px rgba(0,0,0,.06)}
+h2{margin:0 0 15px;font-size:20px}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}label{display:block;font-weight:700;font-size:14px;margin:10px 0 6px}input,select{width:100%;padding:11px;border:1px solid #cfd4da;border-radius:9px;font-size:16px;background:white}
+button{border:0;border-radius:9px;padding:11px 15px;font-weight:700;cursor:pointer;font-size:14px}.primary{background:var(--accent);color:white}.secondary{background:#374151;color:white}.danger{background:var(--red);color:white}.green{background:var(--green);color:white}
+.boxes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px}.box{background:#f8fafc;border-radius:10px;padding:12px}.box small{display:block;color:var(--muted);font-weight:700;margin-bottom:5px}.box strong{font-size:18px}
+.piece,.extra{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px;background:#fafafa}.head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.head strong{font-size:16px}
+.check{display:flex;align-items:center;gap:10px;padding:10px 0}.check input{width:auto}.extra-grid{display:grid;grid-template-columns:1fr 150px 150px;gap:10px;align-items:end}
+.total{background:var(--dark);color:#fff;border-radius:14px;padding:20px;text-align:center;margin-top:15px}.total .label{font-size:14px;color:#d1d5db}.total .amount{font-size:38px;font-weight:800;margin-top:5px}.summary{display:grid;grid-template-columns:1fr 1fr;gap:10px}.line{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:9px 0}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}.note{font-size:12px;color:var(--muted);margin-top:8px}.saved{background:#ecfdf5;border:1px solid #bbf7d0;color:#166534;padding:10px;border-radius:9px;display:none;margin-top:10px}
+@media(max-width:750px){.grid,.row,.boxes,.summary{grid-template-columns:1fr}.full{grid-column:auto}.extra-grid{grid-template-columns:1fr}.container{padding:10px}.brand h1{font-size:25px}}
+@media print{body{background:white}.actions,.no-print{display:none!important}.card{box-shadow:none}.container{max-width:none}}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="brand"><h1>🪨 Little Stone Countertops</h1><p>Calculadora de materiales, fabricación e instalación • V2.0</p></div>
+<div class="grid">
+<section class="card">
+<h2>1. 🪨 Material / Slab</h2>
+<div class="row"><div><label>Largo del slab (pulgadas)</label><input id="slabL" type="number" step="0.01" value="125"></div><div><label>Ancho del slab (pulgadas)</label><input id="slabW" type="number" step="0.01" value="63"></div></div>
+<label>Precio del material ($/sqft)</label><input id="matPrice" type="number" step="0.01" value="18">
+<label>Desperdicio / recargo (%)</label><input id="waste" type="number" step="0.1" value="10">
+<label>Número de slabs comprados</label><input id="slabQty" type="number" min="1" step="1" value="1">
+<div class="boxes"><div class="box"><small>SQFT por slab</small><strong id="slabSqft">0.00</strong></div><div class="box"><small>Costo base por slab</small><strong id="slabBase">$0.00</strong></div><div class="box"><small>Desperdicio por slab</small><strong id="slabWaste">$0.00</strong></div><div class="box"><small>Costo final por slab</small><strong id="slabFinal">$0.00</strong></div></div>
+<div class="box" style="margin-top:10px"><small>Costo total de slabs</small><strong id="allSlabs">$0.00</strong></div>
+<p class="note">Fórmula de sqft: largo × ancho ÷ 144.</p>
+</section>
+
+<section class="card">
+<h2>2. 👤 Información del cliente</h2>
+<label>Nombre del cliente</label><input id="client" type="text" placeholder="Nombre del cliente">
+<label>Proyecto / dirección</label><input id="project" type="text" placeholder="Cocina / proyecto">
+<div class="row"><div><label>Fecha</label><input id="date" type="date"></div><div><label>Material</label><select id="material"><option>Quartz</option><option>Granite</option><option>Marble</option><option>Quartzite</option><option>Porcelain</option><option>Otro</option></select></div></div>
+<div class="box" style="margin-top:15px"><small>Fabricación + instalación</small><strong>$35.00 / sqft</strong><p class="note">Este precio está configurado como tu tarifa de fabricación e instalación.</p></div>
+</section>
+
+<section class="card full">
+<h2>3. 📐 Piezas de la cocina</h2>
+<div id="pieces"></div>
+<button class="primary no-print" onclick="addPiece()">+ Agregar pieza</button>
+<div class="boxes"><div class="box"><small>Total de piezas</small><strong id="pieceCount">0</strong></div><div class="box"><small>Total sqft de la casa</small><strong id="houseSqft">0.00 sqft</strong></div></div>
+</section>
+
+<section class="card">
+<h2>4. 🔨 Fabricación + instalación</h2>
+<label>Precio por sqft</label><input id="laborPrice" type="number" step="0.01" value="35">
+<div class="box" style="margin-top:15px"><small>Sqft × tarifa</small><strong id="laborFormula">0.00 × $35.00</strong></div>
+<div class="box" style="margin-top:10px"><small>Total fabricación + instalación</small><strong id="laborTotal">$0.00</strong></div>
+</section>
+
+<section class="card">
+<h2>5. ➕ Extras</h2>
+<div class="extra"><div class="check"><input type="checkbox" id="sinkOn" onchange="calculate()"><label for="sinkOn" style="margin:0">Sink cutout</label></div><label>Precio</label><input id="sinkPrice" type="number" step="0.01" value="0" oninput="calculate()"></div>
+<div class="extra"><div class="check"><input type="checkbox" id="cookOn" onchange="calculate()"><label for="cookOn" style="margin:0">Cooktop cutout</label></div><label>Precio</label><input id="cookPrice" type="number" step="0.01" value="0" oninput="calculate()"></div>
+<div class="extra"><div class="check"><input type="checkbox" id="backOn" onchange="calculate()"><label for="backOn" style="margin:0">Backsplash</label></div><label>Precio</label><input id="backPrice" type="number" step="0.01" value="0" oninput="calculate()"></div>
+<div class="extra"><div class="check"><input type="checkbox" id="waterOn" onchange="calculate()"><label for="waterOn" style="margin:0">Waterfall</label></div><label>Precio</label><input id="waterPrice" type="number" step="0.01" value="0" oninput="calculate()"></div>
+<div class="extra"><div class="check"><input type="checkbox" id="edgeOn" onchange="calculate()"><label for="edgeOn" style="margin:0">Edge especial</label></div><label>Precio</label><input id="edgePrice" type="number" step="0.01" value="0" oninput="calculate()"></div>
+<div class="extra"><div class="check"><input type="checkbox" id="deliveryOn" onchange="calculate()"><label for="deliveryOn" style="margin:0">Delivery</label></div><label>Precio</label><input id="deliveryPrice" type="number" step="0.01" value="0" oninput="calculate()"></div>
+</section>
+
+<section class="card full">
+<h2>6. 💰 Cotización final</h2>
+<div class="summary"><div><div class="line"><span>Material / slabs</span><strong id="sumMaterial">$0.00</strong></div><div class="line"><span>Fabricación + instalación</span><strong id="sumLabor">$0.00</strong></div><div class="line"><span>Extras</span><strong id="sumExtras">$0.00</strong></div></div><div><div class="line"><span>Total sqft</span><strong id="sumSqft">0.00</strong></div><div class="line"><span>Slabs</span><strong id="sumSlabs">1</strong></div><div class="line"><span>Material</span><strong id="sumType">Quartz</strong></div></div></div>
+<div class="total"><div class="label">TOTAL DEL PROYECTO</div><div class="amount" id="grandTotal">$0.00</div></div>
+<div class="actions no-print"><button class="green" onclick="saveQuote()">💾 Guardar cotización</button><button class="secondary" onclick="window.print()">🖨️ Imprimir / PDF</button><button class="primary" onclick="newQuote()">📋 Nueva cotización</button></div>
+<div class="saved" id="savedMsg">✓ Cotización guardada en este dispositivo.</div>
+</section>
+</div>
+</div>
+<script>
+const ids=['slabL','slabW','matPrice','waste','slabQty','laborPrice','client','project','date','material','sinkOn','sinkPrice','cookOn','cookPrice','backOn','backPrice','waterOn','waterPrice','edgeOn','edgePrice','deliveryOn','deliveryPrice'];
+let pieceNumber=0;
+function money(n){return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n||0)}
+function addPiece(l=0,w=0){pieceNumber++;const d=document.createElement('div');d.className='piece';d.innerHTML=`<div class="head"><strong>Pieza #${pieceNumber}</strong><button class="danger no-print" onclick="this.closest('.piece').remove();calculate()">Eliminar</button></div><div class="row"><div><label>Largo (pulgadas)</label><input class="pL" type="number" step="0.01" value="${l}" oninput="calculate()"></div><div><label>Ancho (pulgadas)</label><input class="pW" type="number" step="0.01" value="${w}" oninput="calculate()"></div></div><div class="note">SQFT de esta pieza: <strong class="pSqft">0.00</strong></div>`;document.getElementById('pieces').appendChild(d);calculate()}
+function extra(on,price){return document.getElementById(on).checked?(parseFloat(document.getElementById(price).value)||0):0}
+function calculate(){
+ const L=parseFloat(slabL.value)||0,W=parseFloat(slabW.value)||0,mp=parseFloat(matPrice.value)||0,wp=parseFloat(waste.value)||0,qty=Math.max(1,parseInt(slabQty.value)||1),lp=parseFloat(laborPrice.value)||0;
+ const ss=(L*W)/144,base=ss*mp,wc=base*wp/100,final=base+wc,all=final*qty;
+ let sqft=0;document.querySelectorAll('.piece').forEach(p=>{const x=(parseFloat(p.querySelector('.pL').value)||0)*(parseFloat(p.querySelector('.pW').value)||0)/144;sqft+=x;p.querySelector('.pSqft').textContent=x.toFixed(2)});
+ const labor=sqft*lp;const extras=extra('sinkOn','sinkPrice')+extra('cookOn','cookPrice')+extra('backOn','backPrice')+extra('waterOn','waterPrice')+extra('edgeOn','edgePrice')+extra('deliveryOn','deliveryPrice');const total=all+labor+extras;
+ slabSqft.textContent=ss.toFixed(2)+' sqft';slabBase.textContent=money(base);slabWaste.textContent=money(wc);slabFinal.textContent=money(final);allSlabs.textContent=money(all);pieceCount.textContent=document.querySelectorAll('.piece').length;houseSqft.textContent=sqft.toFixed(2)+' sqft';laborFormula.textContent=sqft.toFixed(2)+' × '+money(lp);laborTotal.textContent=money(labor);sumMaterial.textContent=money(all);sumLabor.textContent=money(labor);sumExtras.textContent=money(extras);sumSqft.textContent=sqft.toFixed(2)+' sqft';sumSlabs.textContent=qty;sumType.textContent=material.value;grandTotal.textContent=money(total);
+}
+function saveQuote(){const data={};ids.forEach(id=>{const e=document.getElementById(id);data[id]=e.type==='checkbox'?e.checked:e.value});data.pieces=[...document.querySelectorAll('.piece')].map(p=>({l:p.querySelector('.pL').value,w:p.querySelector('.pW').value}));localStorage.setItem('littleStoneQuote',JSON.stringify(data));savedMsg.style.display='block';setTimeout(()=>savedMsg.style.display='none',2500)}
+function loadQuote(){const raw=localStorage.getItem('littleStoneQuote');if(!raw)return;try{const d=JSON.parse(raw);ids.forEach(id=>{const e=document.getElementById(id);if(d[id]!==undefined){if(e.type==='checkbox')e.checked=d[id];else e.value=d[id]}});document.getElementById('pieces').innerHTML='';pieceNumber=0;(d.pieces||[]).forEach(p=>addPiece(p.l,p.w));calculate()}catch(e){}}
+function newQuote(){if(!confirm('¿Quieres empezar una nueva cotización?'))return;localStorage.removeItem('littleStoneQuote');location.reload()}
+ids.forEach(id=>{const e=document.getElementById(id);e.addEventListener('input',calculate);e.addEventListener('change',calculate)});
+if(!date.value){date.value=new Date().toISOString().slice(0,10)}
+loadQuote();
+if(document.querySelectorAll('.piece').length===0){addPiece(112,25);addPiece(25,58);addPiece(88,38)}
+calculate();
+</script>
+</body></html>
