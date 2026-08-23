@@ -1,99 +1,1049 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Little Stone Countertops - Calculadora V2</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Little Stone Countertops - Calculadora v2.7.3 Cloud</title>
 <style>
-:root{--bg:#f4f5f7;--card:#fff;--text:#17202a;--muted:#6b7280;--line:#e5e7eb;--dark:#111827;--accent:#2563eb;--green:#15803d;--red:#dc2626}
-*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
-.container{max-width:1100px;margin:25px auto;padding:18px}.brand{text-align:center;margin-bottom:22px}.brand h1{margin:0;font-size:30px}.brand p{margin:6px 0;color:var(--muted)}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.full{grid-column:1/-1}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 5px 18px rgba(0,0,0,.06)}
-h2{margin:0 0 15px;font-size:20px}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}label{display:block;font-weight:700;font-size:14px;margin:10px 0 6px}input,select{width:100%;padding:11px;border:1px solid #cfd4da;border-radius:9px;font-size:16px;background:white}
-button{border:0;border-radius:9px;padding:11px 15px;font-weight:700;cursor:pointer;font-size:14px}.primary{background:var(--accent);color:white}.secondary{background:#374151;color:white}.danger{background:var(--red);color:white}.green{background:var(--green);color:white}
-.boxes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px}.box{background:#f8fafc;border-radius:10px;padding:12px}.box small{display:block;color:var(--muted);font-weight:700;margin-bottom:5px}.box strong{font-size:18px}
-.piece,.extra{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px;background:#fafafa}.head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.head strong{font-size:16px}
-.check{display:flex;align-items:center;gap:10px;padding:10px 0}.check input{width:auto}.extra-grid{display:grid;grid-template-columns:1fr 150px 150px;gap:10px;align-items:end}
-.total{background:var(--dark);color:#fff;border-radius:14px;padding:20px;text-align:center;margin-top:15px}.total .label{font-size:14px;color:#d1d5db}.total .amount{font-size:38px;font-weight:800;margin-top:5px}.summary{display:grid;grid-template-columns:1fr 1fr;gap:10px}.line{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:9px 0}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}.note{font-size:12px;color:var(--muted);margin-top:8px}.saved{background:#ecfdf5;border:1px solid #bbf7d0;color:#166534;padding:10px;border-radius:9px;display:none;margin-top:10px}
-@media(max-width:750px){.grid,.row,.boxes,.summary{grid-template-columns:1fr}.full{grid-column:auto}.extra-grid{grid-template-columns:1fr}.container{padding:10px}.brand h1{font-size:25px}}
-@media print{body{background:white}.actions,.no-print{display:none!important}.card{box-shadow:none}.container{max-width:none}}
+:root{
+  --bg:#f4f5f7; --card:#ffffff; --line:#e4e7ec; --text:#16181d; --muted:#667085;
+  --purple:#6c5ce7; --purple2:#7b61ff; --green:#15803d; --red:#dc2626; --blue:#2563eb;
+  --dark:#111318;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:Arial,Helvetica,sans-serif;color:var(--text)}
+.app{max-width:1180px;margin:0 auto;padding:10px}
+.topbar{
+  background:linear-gradient(90deg,#111318,#171a20); color:#fff; border-radius:12px;
+  padding:12px 14px; display:grid; grid-template-columns:1fr auto 1fr; gap:12px; align-items:center;
+  box-shadow:0 4px 16px rgba(0,0,0,.12); position:sticky; top:0; z-index:10;
+}
+.brand{font-weight:800; letter-spacing:.08em; font-size:18px; line-height:1.05}
+.brand small{display:block;font-size:11px;letter-spacing:.2em;font-weight:600}
+.title{font-weight:800;font-size:18px;text-align:center}
+.top-actions{display:flex;justify-content:flex-end;gap:8px}
+.iconbtn{border:1px solid rgba(255,255,255,.18);background:#3b2e59;color:#fff;border-radius:8px;padding:8px 10px;font-size:16px;cursor:pointer}
+.iconbtn.danger{background:#431d22;border-color:#7f1d1d}
+.card{
+  background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px;
+  margin-top:10px; box-shadow:0 2px 8px rgba(16,24,40,.04);
+}
+.section-title{display:flex;align-items:center;gap:8px;font-weight:800;font-size:16px;margin-bottom:10px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label{display:block;font-size:12px;font-weight:700;margin-bottom:5px;color:#344054}
+input,select{
+  width:100%; border:1px solid #d0d5dd; border-radius:8px; padding:9px 10px; font-size:14px;
+  background:#fff; color:#111827; outline:none;
+}
+input:focus,select:focus{border-color:#8b7cf6;box-shadow:0 0 0 2px rgba(108,92,231,.10)}
+.material-row{display:grid;grid-template-columns:repeat(5,1fr) 1.2fr;gap:8px;align-items:end}
+.matbtn{
+  border:1px solid #d0d5dd;background:#fff;border-radius:9px;padding:10px 8px;text-align:center;cursor:pointer;
+  min-height:58px;font-weight:700
+}
+.matbtn small{display:block;font-weight:500;margin-top:4px}
+.matbtn.active{border-color:var(--purple2);box-shadow:0 0 0 2px rgba(123,97,255,.10);background:#faf9ff}
+.pieces-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.btn{border:0;border-radius:8px;padding:9px 12px;font-weight:700;cursor:pointer}
+.btn.purple{background:linear-gradient(90deg,#6c5ce7,#7b61ff);color:#fff}
+.btn.green{background:#16803a;color:#fff}
+.btn.blue{background:#2563eb;color:#fff}
+.btn.light{background:#f2f4f7;color:#344054;border:1px solid #d0d5dd}
+.btn.red{background:#fff;color:var(--red);border:1px solid #fecaca}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:760px}
+th{background:#f8fafc;color:#475467;font-size:12px;padding:8px;border-bottom:1px solid var(--line);text-align:left}
+td{padding:7px 8px;border-bottom:1px solid #eef1f4;vertical-align:middle}
+td input,td select{padding:7px 8px;font-size:13px}
+.num{text-align:right}
+.actions{display:flex;gap:6px}
+.smallbtn{padding:6px 8px;border-radius:7px;border:1px solid #d0d5dd;background:#fff;cursor:pointer}
+.smallbtn.del{color:var(--red)}
+tfoot td{font-weight:800;background:#fafafa}
+.summary-card{border:1px solid #eaecf0;border-radius:10px;overflow:hidden}
+.summary-row{display:flex;justify-content:space-between;gap:12px;padding:10px 11px;border-bottom:1px solid #eef1f4;font-size:13px}
+.summary-row:last-child{border-bottom:0}
+.summary-row.total{font-weight:800}
+.summary-row .green{color:var(--green);font-weight:800}
+.summary-row .purple{color:var(--purple);font-weight:800}
+.extras-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.extra-head,.extra-row{display:grid;grid-template-columns:1.5fr .55fr .85fr .75fr;gap:6px;align-items:center}
+.extra-head{font-size:11px;font-weight:800;color:#475467;padding:0 6px 4px}
+.extra-row{border:1px solid var(--line);border-radius:9px;padding:7px;background:#fff}
+.extra-service{display:flex;align-items:center;gap:7px;font-size:13px}
+.extra-row input{padding:6px 7px;font-size:13px}
+.extra-total{text-align:right;font-weight:800;font-size:13px}
+.total-extras{margin-top:6px;border:1px solid var(--line);border-radius:9px;padding:9px 10px;display:flex;justify-content:space-between;font-weight:800}
+.bottom{display:grid;grid-template-columns:1fr 1.4fr;gap:10px;align-items:stretch}
+.grand{
+  display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:10px;padding:14px 16px;
+  background:#fff
+}
+.grand strong{font-size:15px}
+.grand .amount{font-size:28px;color:var(--purple);font-weight:900;text-align:right}
+.grand small{display:block;color:var(--muted);font-size:12px;margin-top:4px}
+.action-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.footer-note{font-size:11px;color:#667085;margin:8px 2px 2px}
+@media(max-width:900px){
+  .grid4{grid-template-columns:1fr 1fr}
+  .material-row{grid-template-columns:repeat(3,1fr)}
+  .bottom{grid-template-columns:1fr}
+}
+@media(max-width:700px){
+  .app{padding:6px}
+  .topbar{grid-template-columns:1fr auto;grid-template-areas:"brand actions" "title title";padding:9px 10px}
+  .brand{grid-area:brand;font-size:14px}.title{grid-area:title;font-size:15px}.top-actions{grid-area:actions}
+  .iconbtn{padding:7px 9px}
+  .card{padding:9px;margin-top:7px;border-radius:10px}
+  .grid4{grid-template-columns:1fr 1fr;gap:7px}
+  .grid2{grid-template-columns:1fr}
+  .material-row{grid-template-columns:repeat(2,1fr)}
+  .matbtn{min-height:52px;padding:8px 6px;font-size:13px}
+  .extras-grid{grid-template-columns:1fr}
+  .extra-head{grid-template-columns:1.4fr .5fr .8fr .7fr}
+  .extra-row{grid-template-columns:1.4fr .5fr .8fr .7fr}
+  .grand .amount{font-size:24px}
+  .action-grid{grid-template-columns:1fr 1fr}
+}
+
+input:disabled{background:#f2f4f7;color:#667085}
+@media(max-width:700px){
+  table{min-width:1050px}
+}
+
+.cloud-meta{display:grid;grid-template-columns:1fr 1fr 1fr 1.2fr .8fr .9fr;gap:8px}
+.cloud-badge{font-size:11px;background:#ecfdf3;color:#166534;border:1px solid #bbf7d0;border-radius:999px;padding:4px 8px}
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(15,23,42,.52);z-index:999;align-items:center;justify-content:center;padding:12px}
+.modal-backdrop.show{display:flex}
+.modal{background:#fff;border-radius:14px;max-width:620px;width:100%;max-height:88vh;overflow:auto;box-shadow:0 24px 70px rgba(0,0,0,.25);border:1px solid #e5e7eb}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid #e5e7eb}
+.modal-head h3{margin:0;font-size:18px}
+.modal-body{padding:14px 16px}
+.closebtn{border:0;background:#f3f4f6;border-radius:8px;padding:6px 9px;cursor:pointer}
+.cloud-search{display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:12px}
+.result-item{border:1px solid #e5e7eb;border-radius:10px;padding:10px;margin-bottom:8px;cursor:pointer;background:#fff}
+.result-item:hover{background:#f9fafb}
+.result-name{font-weight:800}
+.result-sub{font-size:12px;color:#667085;margin-top:3px}
+.project-list{margin-top:8px;padding-left:10px;border-left:3px solid #ede9fe}
+.project-item{padding:8px;border-radius:8px;background:#fafafa;margin:6px 0;cursor:pointer}
+.project-item:hover{background:#f3f4f6}
+.login-grid{display:grid;gap:9px}
+.login-status{font-size:12px;color:#667085;margin-top:8px}
+@media(max-width:900px){.cloud-meta{grid-template-columns:1fr 1fr 1fr}}
+@media(max-width:700px){.cloud-meta{grid-template-columns:1fr 1fr}}
+
+
+.newquote-btn{
+  border:1px solid #ddd6fe;
+  background:#f5f3ff;
+  color:#5b21b6;
+  border-radius:9px;
+  padding:7px 11px;
+  font-weight:800;
+  font-size:12px;
+  cursor:pointer;
+  white-space:nowrap;
+}
+.newquote-btn:hover{background:#ede9fe}
+@media(max-width:700px){
+  .newquote-btn{padding:7px 9px;font-size:11px}
+}
+
+.save-state{
+  font-size:11px;
+  font-weight:800;
+  padding:5px 8px;
+  border-radius:999px;
+  white-space:nowrap;
+}
+.save-state.unsaved{background:#fff7ed;color:#9a3412;border:1px solid #fed7aa}
+.save-state.saved{background:#ecfdf3;color:#166534;border:1px solid #bbf7d0}
+@media(max-width:700px){.save-state{font-size:10px;padding:4px 7px}}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style id="v273-mobile-hardening">
+/* Mobile/iPad hardening. No business logic changes. */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{min-height:100dvh}
+button,input,select{-webkit-tap-highlight-color:transparent}
+button,.btn,.iconbtn,.newquote-btn,.smallbtn,.matbtn{touch-action:manipulation}
+.table-wrap{-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.modal{max-height:min(88vh,88dvh)}
+@media(max-width:700px){
+  input,select{font-size:16px}
+  td input,td select,.extra-row input{font-size:16px}
+  .top-actions{flex-wrap:wrap;align-items:center;gap:6px}
+  .iconbtn,.newquote-btn,.btn,.smallbtn{min-height:44px}
+  .iconbtn{min-width:44px}
+  .newquote-btn{padding:9px 10px;font-size:12px}
+  .save-state{min-height:32px;display:inline-flex;align-items:center}
+  .modal-backdrop{padding:max(8px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left))}
+  .modal{max-height:92dvh}
+}
+@media(max-width:480px){
+  .app{padding-left:max(5px,env(safe-area-inset-left));padding-right:max(5px,env(safe-area-inset-right))}
+  .topbar{grid-template-columns:1fr;grid-template-areas:"brand" "title" "actions";gap:7px;top:0}
+  .top-actions{justify-content:flex-start;width:100%}
+  .grid4,.cloud-meta{grid-template-columns:1fr}
+  .material-row{grid-template-columns:1fr 1fr}
+  .action-grid{grid-template-columns:1fr}
+  .pieces-head{gap:8px;align-items:flex-start;flex-wrap:wrap}
+  .extra-head,.extra-row{grid-template-columns:minmax(110px,1.35fr) minmax(54px,.55fr) minmax(82px,.8fr) minmax(76px,.7fr)}
+  .extra-service{font-size:12px}
+  .grand{padding:12px;gap:8px}
+}
+</style>
+
 </head>
 <body>
-<div class="container">
-<div class="brand"><h1>🪨 Little Stone Countertops</h1><p>Calculadora de materiales, fabricación e instalación • V2.0</p></div>
-<div class="grid">
-<section class="card">
-<h2>1. 🪨 Material / Slab</h2>
-<div class="row"><div><label>Largo del slab (pulgadas)</label><input id="slabL" type="number" step="0.01" value="125"></div><div><label>Ancho del slab (pulgadas)</label><input id="slabW" type="number" step="0.01" value="63"></div></div>
-<label>Precio del material ($/sqft)</label><input id="matPrice" type="number" step="0.01" value="18">
-<label>Desperdicio / recargo (%)</label><input id="waste" type="number" step="0.1" value="10">
-<label>Número de slabs comprados</label><input id="slabQty" type="number" min="1" step="1" value="1">
-<div class="boxes"><div class="box"><small>SQFT por slab</small><strong id="slabSqft">0.00</strong></div><div class="box"><small>Costo base por slab</small><strong id="slabBase">$0.00</strong></div><div class="box"><small>Desperdicio por slab</small><strong id="slabWaste">$0.00</strong></div><div class="box"><small>Costo final por slab</small><strong id="slabFinal">$0.00</strong></div></div>
-<div class="box" style="margin-top:10px"><small>Costo total de slabs</small><strong id="allSlabs">$0.00</strong></div>
-<p class="note">Fórmula de sqft: largo × ancho ÷ 144.</p>
-</section>
+<div class="app">
 
-<section class="card">
-<h2>2. 👤 Información del cliente</h2>
-<label>Nombre del cliente</label><input id="client" type="text" placeholder="Nombre del cliente">
-<label>Proyecto / dirección</label><input id="project" type="text" placeholder="Cocina / proyecto">
-<div class="row"><div><label>Fecha</label><input id="date" type="date"></div><div><label>Material</label><select id="material"><option>Quartz</option><option>Granite</option><option>Marble</option><option>Quartzite</option><option>Porcelain</option><option>Otro</option></select></div></div>
-<div class="box" style="margin-top:15px"><small>Fabricación + instalación</small><strong>$35.00 / sqft</strong><p class="note">Este precio está configurado como tu tarifa de fabricación e instalación.</p></div>
-</section>
+  <div class="topbar">
+    <div class="brand">LITTLE STONE<small>COUNTERTOPS</small></div>
+    <div class="title">Calculadora v2.7.3 Cloud</div>
+    <div class="top-actions">
+      <span id="saveStateBadge" class="save-state unsaved">Nueva cotización</span>
+      <button class="newquote-btn" onclick="newCloudQuote()" title="Nueva cotización">➕ Nueva cotización</button>
+      <button class="iconbtn" onclick="saveCloudQuote()" title="Guardar en la nube">💾</button>
+      <button class="iconbtn" onclick="openClientSearch()" title="Buscar cliente">🔍</button>
+      <button class="iconbtn" onclick="openLogin()" title="Cuenta" id="accountBtn">👤</button>
+      <button class="iconbtn danger" onclick="resetAll()" title="Limpiar">🗑️</button>
+    </div>
+  </div>
 
-<section class="card full">
-<h2>3. 📐 Piezas de la cocina</h2>
-<div id="pieces"></div>
-<button class="primary no-print" onclick="addPiece()">+ Agregar pieza</button>
-<div class="boxes"><div class="box"><small>Total de piezas</small><strong id="pieceCount">0</strong></div><div class="box"><small>Total sqft de la casa</small><strong id="houseSqft">0.00 sqft</strong></div></div>
-</section>
+  <section class="card">
+    <div class="cloud-meta">
+      <div><label>Nombre</label><input id="firstName" placeholder="Nombre"></div>
+      <div><label>Apellido</label><input id="lastName" placeholder="Apellido"></div>
+      <div><label>Teléfono</label><input id="clientPhone" placeholder="Teléfono"></div>
+      <div><label>Proyecto</label><input id="project" placeholder="Nombre del proyecto"></div>
+      <div><label>Estimate #</label><input id="estimateNo" placeholder="Auto"></div>
+      <div><label>Fecha</label><input id="date" type="date"></div>
+    </div>
+  </section>
 
-<section class="card">
-<h2>4. 🔨 Fabricación + instalación</h2>
-<label>Precio por sqft</label><input id="laborPrice" type="number" step="0.01" value="35">
-<div class="box" style="margin-top:15px"><small>Sqft × tarifa</small><strong id="laborFormula">0.00 × $35.00</strong></div>
-<div class="box" style="margin-top:10px"><small>Total fabricación + instalación</small><strong id="laborTotal">$0.00</strong></div>
-</section>
+  <section class="card">
+    <div class="section-title">🪨 MATERIAL / SLAB</div>
+    <div class="grid4">
+      <div>
+        <label>Largo del slab (pulgadas)</label>
+        <input id="slabLength" type="number" step="0.01" value="" oninput="calculate()">
+      </div>
+      <div>
+        <label>Ancho del slab (pulgadas)</label>
+        <input id="slabWidth" type="number" step="0.01" value="" oninput="calculate()">
+      </div>
+      <div>
+        <label>Costo material ($ / sqft)</label>
+        <input id="materialPrice" type="number" step="0.01" value="" oninput="calculate()">
+      </div>
+      <div>
+        <label>Recargo / desperdicio (%)</label>
+        <input id="materialMarkup" type="number" step="0.1" value="" oninput="calculate()">
+      </div>
+    </div>
+    <div class="grid4" style="margin-top:10px">
+      <div class="summary-card">
+        <div class="summary-row total"><span>SQFT por slab</span><strong id="slabSqft">0.00 sqft</strong></div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-row total"><span>Costo base</span><strong id="slabBase">$0.00</strong></div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-row total"><span>Recargo</span><strong id="slabMarkupCost">$0.00</strong></div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-row total"><span>Costo final slab</span><span class="green" id="slabFinal">$0.00</span></div>
+      </div>
+    </div>
+  </section>
 
-<section class="card">
-<h2>5. ➕ Extras</h2>
-<div class="extra"><div class="check"><input type="checkbox" id="sinkOn" onchange="calculate()"><label for="sinkOn" style="margin:0">Sink cutout</label></div><label>Precio</label><input id="sinkPrice" type="number" step="0.01" value="0" oninput="calculate()"></div>
-<div class="extra"><div class="check"><input type="checkbox" id="cookOn" onchange="calculate()"><label for="cookOn" style="margin:0">Cooktop cutout</label></div><label>Precio</label><input id="cookPrice" type="number" step="0.01" value="0" oninput="calculate()"></div>
-<div class="extra"><div class="check"><input type="checkbox" id="backOn" onchange="calculate()"><label for="backOn" style="margin:0">Backsplash</label></div><label>Precio</label><input id="backPrice" type="number" step="0.01" value="0" oninput="calculate()"></div>
-<div class="extra"><div class="check"><input type="checkbox" id="waterOn" onchange="calculate()"><label for="waterOn" style="margin:0">Waterfall</label></div><label>Precio</label><input id="waterPrice" type="number" step="0.01" value="0" oninput="calculate()"></div>
-<div class="extra"><div class="check"><input type="checkbox" id="edgeOn" onchange="calculate()"><label for="edgeOn" style="margin:0">Edge especial</label></div><label>Precio</label><input id="edgePrice" type="number" step="0.01" value="0" oninput="calculate()"></div>
-<div class="extra"><div class="check"><input type="checkbox" id="deliveryOn" onchange="calculate()"><label for="deliveryOn" style="margin:0">Delivery</label></div><label>Precio</label><input id="deliveryPrice" type="number" step="0.01" value="0" oninput="calculate()"></div>
-</section>
+  <section class="card">
+    <div class="pieces-head">
+      <div class="section-title" style="margin:0">▣ 1. PIEZAS</div>
+      <button class="btn purple" onclick="addPiece()">＋ Agregar pieza</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>#</th><th>Nombre / área</th><th>Tipo</th><th>Largo (in)</th><th>Ancho (in)</th><th>B/S 4"</th><th>Top sqft</th><th>B/S sqft</th><th>Total sqft</th><th>Acciones</th></tr>
+        </thead>
+        <tbody id="piecesBody"></tbody>
+        <tfoot>
+          <tr><td colspan="6" class="num">Total piezas:</td><td id="topSqftTotal">0.00</td><td id="bsSqftTotal">0.00</td><td id="totalSqft">0.00 sqft</td><td></td></tr>
+        </tfoot>
+      </table>
+    </div>
+  </section>
 
-<section class="card full">
-<h2>6. 💰 Cotización final</h2>
-<div class="summary"><div><div class="line"><span>Material / slabs</span><strong id="sumMaterial">$0.00</strong></div><div class="line"><span>Fabricación + instalación</span><strong id="sumLabor">$0.00</strong></div><div class="line"><span>Extras</span><strong id="sumExtras">$0.00</strong></div></div><div><div class="line"><span>Total sqft</span><strong id="sumSqft">0.00</strong></div><div class="line"><span>Slabs</span><strong id="sumSlabs">1</strong></div><div class="line"><span>Material</span><strong id="sumType">Quartz</strong></div></div></div>
-<div class="total"><div class="label">TOTAL DEL PROYECTO</div><div class="amount" id="grandTotal">$0.00</div></div>
-<div class="actions no-print"><button class="green" onclick="saveQuote()">💾 Guardar cotización</button><button class="secondary" onclick="window.print()">🖨️ Imprimir / PDF</button><button class="primary" onclick="newQuote()">📋 Nueva cotización</button></div>
-<div class="saved" id="savedMsg">✓ Cotización guardada en este dispositivo.</div>
-</section>
+  <div class="grid2">
+    <section class="card">
+      <div class="section-title">🪨 2. COSTO DEL MATERIAL</div>
+      <div class="summary-card">
+        <div class="summary-row"><span>SQFT por slab</span><strong id="matSqft">0.00 sqft</strong></div>
+        <div class="summary-row"><span>Costo material por sqft</span><strong id="matPriceSummary">$0.00</strong></div>
+        <div class="summary-row"><span>Recargo / desperdicio</span><strong id="matMarkupSummary">0%</strong></div>
+        <div class="summary-row total"><span>Costo final del slab</span><span class="green" id="matTotal">$0.00</span></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-title">🛠️ 3. MANO DE OBRA (FABRICACIÓN + INSTALACIÓN)</div>
+      <div class="summary-card">
+        <div class="summary-row"><span>Tarifa por sqft ($)</span><input id="laborPrice" type="number" step="0.01" value="" style="max-width:120px" oninput="calculate()"></div>
+        <div class="summary-row"><span>Total mano de obra</span><span class="green" id="laborTotal">$0.00</span></div>
+        <div class="summary-row"><span>Subtotal (Material + Mano de obra)</span><strong id="subtotal">$0.00</strong></div>
+        <div class="summary-row"><span>Contingencia (%)</span><input id="contingency" type="number" step="0.1" value="" style="max-width:120px" oninput="calculate()"></div>
+        <div class="summary-row total"><span>Subtotal + Contingencia</span><span class="purple" id="subtotalCont">$0.00</span></div>
+      </div>
+    </section>
+  </div>
+
+  <section class="card">
+    <div class="pieces-head">
+      <div class="section-title" style="margin:0">4. ＋ EXTRAS</div>
+      <button class="btn light" onclick="addCustomExtra()">＋ Agregar nota</button>
+    </div>
+    <div class="extras-grid" id="extrasGrid"></div>
+    <div class="total-extras"><span>Total extras:</span><span style="color:var(--green)" id="extrasTotal">$0.00</span></div>
+  </section>
+
+  <section class="card bottom">
+    <div class="grand">
+      <div><strong>📊 RESUMEN TOTAL</strong><small>Total del proyecto</small></div>
+      <div class="amount" id="grandTotal">$0.00</div>
+    </div>
+    <div class="action-grid">
+      <button class="btn green" onclick="shareWhatsApp()">🟢 Enviar por WhatsApp</button>
+      <button class="btn blue" onclick="window.print()">🖨️ Imprimir / PDF</button>
+      <button class="btn light" onclick="window.print()">⬇ Descargar PDF</button>
+      <button class="btn light" onclick="copyLink()">🔗 Compartir enlace</button>
+    </div>
+  </section>
+
+  <div class="footer-note">* Precios y cálculos estimados. Los precios pueden variar.</div>
 </div>
+
+<div class="modal-backdrop" id="loginModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>🔐 Acceso Little Stone</h3>
+      <button class="closebtn" onclick="closeModal('loginModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="login-grid" id="loginForm">
+        <div><label>Email</label><input id="loginEmail" type="email" placeholder="tu@email.com"></div>
+        <div><label>Contraseña</label><input id="loginPassword" type="password" placeholder="Contraseña"></div>
+        <button class="btn purple" onclick="signInCloud()">Entrar</button>
+        <div class="login-status" id="loginStatus"></div>
+      </div>
+      <div id="loggedInPanel" style="display:none">
+        <p style="margin-top:0">Sesión iniciada como <strong id="loggedInEmail"></strong></p>
+        <button class="btn red" onclick="signOutCloud()">Cerrar sesión</button>
+      </div>
+    </div>
+  </div>
 </div>
+
+<div class="modal-backdrop" id="clientSearchModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>🔍 Buscar cliente</h3>
+      <button class="closebtn" onclick="closeModal('clientSearchModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="cloud-search">
+        <input id="clientSearchInput" placeholder="Nombre, apellido o teléfono" oninput="searchClientsDebounced()">
+        <button class="btn purple" onclick="searchClients()">Buscar</button>
+      </div>
+      <div id="clientSearchResults">
+        <div class="result-sub">Empieza a escribir para buscar clientes.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <script>
-const ids=['slabL','slabW','matPrice','waste','slabQty','laborPrice','client','project','date','material','sinkOn','sinkPrice','cookOn','cookPrice','backOn','backPrice','waterOn','waterPrice','edgeOn','edgePrice','deliveryOn','deliveryPrice'];
-let pieceNumber=0;
-function money(n){return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n||0)}
-function addPiece(l=0,w=0){pieceNumber++;const d=document.createElement('div');d.className='piece';d.innerHTML=`<div class="head"><strong>Pieza #${pieceNumber}</strong><button class="danger no-print" onclick="this.closest('.piece').remove();calculate()">Eliminar</button></div><div class="row"><div><label>Largo (pulgadas)</label><input class="pL" type="number" step="0.01" value="${l}" oninput="calculate()"></div><div><label>Ancho (pulgadas)</label><input class="pW" type="number" step="0.01" value="${w}" oninput="calculate()"></div></div><div class="note">SQFT de esta pieza: <strong class="pSqft">0.00</strong></div>`;document.getElementById('pieces').appendChild(d);calculate()}
-function extra(on,price){return document.getElementById(on).checked?(parseFloat(document.getElementById(price).value)||0):0}
-function calculate(){
- const L=parseFloat(slabL.value)||0,W=parseFloat(slabW.value)||0,mp=parseFloat(matPrice.value)||0,wp=parseFloat(waste.value)||0,qty=Math.max(1,parseInt(slabQty.value)||1),lp=parseFloat(laborPrice.value)||0;
- const ss=(L*W)/144,base=ss*mp,wc=base*wp/100,final=base+wc,all=final*qty;
- let sqft=0;document.querySelectorAll('.piece').forEach(p=>{const x=(parseFloat(p.querySelector('.pL').value)||0)*(parseFloat(p.querySelector('.pW').value)||0)/144;sqft+=x;p.querySelector('.pSqft').textContent=x.toFixed(2)});
- const labor=sqft*lp;const extras=extra('sinkOn','sinkPrice')+extra('cookOn','cookPrice')+extra('backOn','backPrice')+extra('waterOn','waterPrice')+extra('edgeOn','edgePrice')+extra('deliveryOn','deliveryPrice');const total=all+labor+extras;
- slabSqft.textContent=ss.toFixed(2)+' sqft';slabBase.textContent=money(base);slabWaste.textContent=money(wc);slabFinal.textContent=money(final);allSlabs.textContent=money(all);pieceCount.textContent=document.querySelectorAll('.piece').length;houseSqft.textContent=sqft.toFixed(2)+' sqft';laborFormula.textContent=sqft.toFixed(2)+' × '+money(lp);laborTotal.textContent=money(labor);sumMaterial.textContent=money(all);sumLabor.textContent=money(labor);sumExtras.textContent=money(extras);sumSqft.textContent=sqft.toFixed(2)+' sqft';sumSlabs.textContent=qty;sumType.textContent=material.value;grandTotal.textContent=money(total);
+const areaOptions = [
+  "Kitchen","Master Bathroom","Main Floor Bathroom","Basement Bathroom",
+  "Laundry Room","Bar","Pantry","Other"
+];
+
+let pieces = [
+  {area:"Kitchen", type:"kitchen", length:"", width:26, backsplash:true},
+  {area:"Master Bathroom", type:"bathroom", length:"", width:23, backsplash:true},
+  {area:"Main Floor Bathroom", type:"bathroom", length:"", width:23, backsplash:true}
+];
+
+let extras = [
+  {name:"Bathroom sink", icon:"🛁", qty:"", price:""},
+  {name:"Kitchen sink", icon:"🚰", qty:"", price:""},
+  {name:"Outlet cutout", icon:"🔌", qty:"", price:""},
+  {name:"Full-height backsplash", icon:"▦", qty:"", price:""},
+  {name:"Remnants", icon:"🪨", qty:"", price:""},
+  {name:"Demolition", icon:"🔨", qty:"", price:""},
+  {name:"Cooktop cutout", icon:"▣", qty:"", price:""},
+  {name:"Edge especial", icon:"◩", qty:"", price:""},
+  {name:"Delivery", icon:"🚚", qty:"", price:""}
+];
+
+function money(v){
+  return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(Number(v)||0);
 }
-function saveQuote(){const data={};ids.forEach(id=>{const e=document.getElementById(id);data[id]=e.type==='checkbox'?e.checked:e.value});data.pieces=[...document.querySelectorAll('.piece')].map(p=>({l:p.querySelector('.pL').value,w:p.querySelector('.pW').value}));localStorage.setItem('littleStoneQuote',JSON.stringify(data));savedMsg.style.display='block';setTimeout(()=>savedMsg.style.display='none',2500)}
-function loadQuote(){const raw=localStorage.getItem('littleStoneQuote');if(!raw)return;try{const d=JSON.parse(raw);ids.forEach(id=>{const e=document.getElementById(id);if(d[id]!==undefined){if(e.type==='checkbox')e.checked=d[id];else e.value=d[id]}});document.getElementById('pieces').innerHTML='';pieceNumber=0;(d.pieces||[]).forEach(p=>addPiece(p.l,p.w));calculate()}catch(e){}}
-function newQuote(){if(!confirm('¿Quieres empezar una nueva cotización?'))return;localStorage.removeItem('littleStoneQuote');location.reload()}
-ids.forEach(id=>{const e=document.getElementById(id);e.addEventListener('input',calculate);e.addEventListener('change',calculate)});
-if(!date.value){date.value=new Date().toISOString().slice(0,10)}
-loadQuote();
-if(document.querySelectorAll('.piece').length===0){addPiece(112,25);addPiece(25,58);addPiece(88,38)}
-calculate();
+function sqft(l,w){ return ((Number(l)||0)*(Number(w)||0))/144; }
+
+function selectMaterial(btn){
+  document.querySelectorAll('.matbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const p = btn.dataset.price;
+  if(p!=="") document.getElementById('materialPrice').value = p;
+  calculate();
+}
+
+function renderPieces(){
+  const body = document.getElementById('piecesBody');
+  body.innerHTML = "";
+  pieces.forEach((p,i)=>{
+    if(!p.type) p.type = "custom";
+    if(typeof p.backsplash === "undefined") p.backsplash = false;
+    if(p.type==="kitchen") p.width=26;
+    if(p.type==="bathroom") p.width=23;
+
+    const opts = areaOptions.map(o=>`<option ${o===p.area?'selected':''}>${o}</option>`).join('');
+    const typeOpts = `
+      <option value="kitchen" ${p.type==="kitchen"?'selected':''}>Kitchen Standard</option>
+      <option value="bathroom" ${p.type==="bathroom"?'selected':''}>Bathroom Standard</option>
+      <option value="custom" ${p.type==="custom"?'selected':''}>Custom</option>`;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i+1}</td>
+      <td><select onchange="pieces[${i}].area=this.value;saveTemp()">${opts}</select></td>
+      <td><select onchange="changePieceType(${i},this.value)">${typeOpts}</select></td>
+      <td><input type="number" step="0.01" value="${p.length}" oninput="pieces[${i}].length=this.value;calculate()"></td>
+      <td><input type="number" step="0.01" value="${p.width}" ${p.type!=="custom"?'disabled':''} oninput="pieces[${i}].width=this.value;calculate()"></td>
+      <td style="text-align:center"><input type="checkbox" ${p.backsplash?'checked':''} onchange="pieces[${i}].backsplash=this.checked;calculate()" style="width:18px;height:18px"></td>
+      <td id="top-${i}">0.00</td>
+      <td id="bs-${i}">0.00</td>
+      <td id="sqft-${i}">0.00</td>
+      <td><div class="actions"><button class="smallbtn del" onclick="removePiece(${i})">🗑</button></div></td>
+    `;
+    body.appendChild(tr);
+  });
+  calculate();
+}
+function changePieceType(i,type){
+  pieces[i].type=type;
+  if(type==="kitchen"){
+    pieces[i].width=26;
+    pieces[i].backsplash=true;
+    if(!pieces[i].area || pieces[i].area==="Other") pieces[i].area="Kitchen";
+  }else if(type==="bathroom"){
+    pieces[i].width=23;
+    pieces[i].backsplash=true;
+    if(!pieces[i].area || pieces[i].area==="Kitchen" || pieces[i].area==="Other") pieces[i].area="Master Bathroom";
+  }
+  renderPieces();
+}
+function addPiece(){ pieces.push({area:"Kitchen",type:"kitchen",length:0,width:26,backsplash:true}); renderPieces(); }
+function removePiece(i){ pieces.splice(i,1); renderPieces(); }
+
+function renderExtras(){
+  const grid = document.getElementById('extrasGrid');
+  grid.innerHTML = "";
+  const left = extras.slice(0,4), right = extras.slice(4);
+  [left,right].forEach(group=>{
+    const col = document.createElement('div');
+    col.innerHTML = `<div class="extra-head"><div>Servicio</div><div>Cant.</div><div>Precio unit.</div><div>Total</div></div>`;
+    group.forEach(ex=>{
+      const idx = extras.indexOf(ex);
+      const row = document.createElement('div');
+      row.className = "extra-row";
+      row.innerHTML = `
+        <div class="extra-service"><span>${ex.icon}</span><span>${ex.name}</span></div>
+        <input type="number" min="0" step="1" value="${ex.qty}" oninput="extras[${idx}].qty=this.value;calculate()">
+        <input type="number" step="0.01" value="${ex.price}" oninput="extras[${idx}].price=this.value;calculate()">
+        <div class="extra-total" id="extra-${idx}">$0.00</div>`;
+      col.appendChild(row);
+    });
+    grid.appendChild(col);
+  });
+  calculate();
+}
+function addCustomExtra(){
+  const name = prompt("Nombre del servicio:");
+  if(!name) return;
+  extras.push({name,icon:"＋",qty:1,price:0});
+  renderExtras();
+}
+
+function calculate(){
+  const slabL = Number(document.getElementById('slabLength').value)||0;
+  const slabW = Number(document.getElementById('slabWidth').value)||0;
+  const mp = Number(document.getElementById('materialPrice').value)||0;
+  const markup = Number(document.getElementById('materialMarkup').value)||0;
+  const lp = Number(document.getElementById('laborPrice').value)||0;
+  const contingency = Number(document.getElementById('contingency').value)||0;
+
+  const slabSq = (slabL*slabW)/144;
+  const slabBase = slabSq*mp;
+  const slabMarkupCost = slabBase*(markup/100);
+  const materialTotal = slabBase+slabMarkupCost;
+
+  let totalSq = 0;
+  let totalTopSq = 0;
+  let totalBsSq = 0;
+  pieces.forEach((p,i)=>{
+    const topSq = sqft(p.length,p.width);
+    const bsSq = p.backsplash ? sqft(p.length,4) : 0;
+    const s = topSq + bsSq;
+    totalTopSq += topSq;
+    totalBsSq += bsSq;
+    totalSq += s;
+    const topCell = document.getElementById(`top-${i}`);
+    const bsCell = document.getElementById(`bs-${i}`);
+    const sqCell = document.getElementById(`sqft-${i}`);
+    if(topCell) topCell.textContent = topSq.toFixed(2);
+    if(bsCell) bsCell.textContent = bsSq.toFixed(2);
+    if(sqCell) sqCell.textContent = s.toFixed(2);
+  });
+
+  const laborTotal = totalSq*lp;
+  const subtotal = materialTotal+laborTotal;
+  const contAmount = subtotal*(contingency/100);
+  const subtotalCont = subtotal+contAmount;
+
+  let extrasTotal = 0;
+  extras.forEach((e,i)=>{
+    const t=(Number(e.qty)||0)*(Number(e.price)||0);
+    extrasTotal += t;
+    const cell=document.getElementById(`extra-${i}`);
+    if(cell) cell.textContent=money(t);
+  });
+
+  const grand = subtotalCont + extrasTotal;
+
+  document.getElementById('slabSqft').textContent = slabSq.toFixed(2)+" sqft";
+  document.getElementById('slabBase').textContent = money(slabBase);
+  document.getElementById('slabMarkupCost').textContent = money(slabMarkupCost);
+  document.getElementById('slabFinal').textContent = money(materialTotal);
+
+  document.getElementById('topSqftTotal').textContent = totalTopSq.toFixed(2);
+  document.getElementById('bsSqftTotal').textContent = totalBsSq.toFixed(2);
+  document.getElementById('totalSqft').textContent = totalSq.toFixed(2)+" sqft";
+  document.getElementById('matSqft').textContent = slabSq.toFixed(2)+" sqft";
+  document.getElementById('matPriceSummary').textContent = money(mp);
+  document.getElementById('matMarkupSummary').textContent = markup.toFixed(1).replace('.0','')+"%";
+  document.getElementById('matTotal').textContent = money(materialTotal);
+  document.getElementById('laborTotal').textContent = money(laborTotal);
+  document.getElementById('subtotal').textContent = money(subtotal);
+  document.getElementById('subtotalCont').textContent = money(subtotalCont);
+  document.getElementById('extrasTotal').textContent = money(extrasTotal);
+  document.getElementById('grandTotal').textContent = money(grand);
+  saveTemp();
+}
+
+function currentQuote(){
+  return {
+    firstName:document.getElementById('firstName').value,
+    lastName:document.getElementById('lastName').value,
+    phone:document.getElementById('clientPhone').value,
+    project:document.getElementById('project').value,
+    estimateNo:document.getElementById('estimateNo').value,
+    date:document.getElementById('date').value,
+    slabLength:document.getElementById('slabLength').value,
+    slabWidth:document.getElementById('slabWidth').value,
+    materialPrice:document.getElementById('materialPrice').value,
+    materialMarkup:document.getElementById('materialMarkup').value,
+    laborPrice:document.getElementById('laborPrice').value,
+    contingency:document.getElementById('contingency').value,
+    pieces, extras
+  };
+}
+function saveTemp(){ localStorage.setItem('littleStoneTemp',JSON.stringify(currentQuote())); }
+function saveQuoteLegacy(){
+  const q=currentQuote();
+  const key='littleStoneQuotes';
+  const arr=JSON.parse(localStorage.getItem(key)||'[]');
+  arr.push({...q,savedAt:new Date().toISOString()});
+  localStorage.setItem(key,JSON.stringify(arr));
+  alert('Cotización guardada en este dispositivo.');
+}
+function loadQuotesLegacy(){
+  const arr=JSON.parse(localStorage.getItem('littleStoneQuotes')||'[]');
+  if(!arr.length){ alert('No hay cotizaciones guardadas todavía.'); return; }
+  const names=arr.map((q,i)=>`${i+1}. ${q.client||'Sin nombre'} - ${q.project||'Sin proyecto'}`).join('\n');
+  const n=prompt('Escribe el número de la cotización que quieres abrir:\n\n'+names);
+  const idx=Number(n)-1;
+  if(idx<0||idx>=arr.length) return;
+  const q=arr[idx];
+  document.getElementById('client').value=q.client||'';
+  document.getElementById('project').value=q.project||'';
+  document.getElementById('estimateNo').value=q.estimateNo||'';
+  document.getElementById('date').value=q.date||'';
+  document.getElementById('slabLength').value=q.slabLength||125;
+  document.getElementById('slabWidth').value=q.slabWidth||63;
+  document.getElementById('materialPrice').value=q.materialPrice||18;
+  document.getElementById('materialMarkup').value=q.materialMarkup||10;
+  document.getElementById('laborPrice').value=q.laborPrice||35;
+  document.getElementById('contingency').value=q.contingency||10;
+  pieces=q.pieces||[];
+  extras=q.extras||extras;
+  renderPieces(); renderExtras();
+}
+function resetAll(){
+  if(!confirm('¿Limpiar esta cotización?')) return;
+  document.getElementById('firstName').value='';
+  document.getElementById('lastName').value='';
+  document.getElementById('clientPhone').value='';
+  document.getElementById('project').value='';
+  document.getElementById('estimateNo').value='';
+  document.getElementById('date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('slabLength').value=125;
+  document.getElementById('slabWidth').value=63;
+  document.getElementById('materialPrice').value=18;
+  document.getElementById('materialMarkup').value=10;
+  document.getElementById('laborPrice').value=35;
+  document.getElementById('contingency').value=10;
+  pieces=[{area:"Kitchen",type:"kitchen",length:0,width:26,backsplash:true}];
+  extras=extras.map(e=>({...e,qty:1,price:0}));
+  renderPieces();renderExtras();
+}
+function shareWhatsApp(){
+  const client=((document.getElementById('firstName').value||'')+' '+(document.getElementById('lastName').value||'')).trim()||'Cliente';
+  const total=document.getElementById('grandTotal').textContent;
+  const text=`Little Stone Countertops\n${client}\nTotal estimado: ${total}`;
+  window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank');
+}
+function copyLink(){
+  navigator.clipboard.writeText(location.href).then(()=>alert('Enlace copiado.'));
+}
+
+document.getElementById('date').value = new Date().toISOString().slice(0,10);
+renderPieces();
+renderExtras();
+
+// ===== SUPABASE CLOUD V2.5 =====
+const SUPABASE_URL = 'https://nzevtbgrecdbfjwitfhy.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_GrXrmegpHdtHDKjYNZFxrg_IwpYojQo';
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+let cloudProjectId = null;
+let searchTimer = null;
+
+function openModal(id){ document.getElementById(id).classList.add('show'); }
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+
+async function refreshAuthUI(){
+  const { data: { session } } = await db.auth.getSession();
+  const btn = document.getElementById('accountBtn');
+  if(session?.user){
+    btn.textContent='✅';
+    btn.title='Sesión iniciada';
+    document.getElementById('loginForm').style.display='none';
+    document.getElementById('loggedInPanel').style.display='block';
+    document.getElementById('loggedInEmail').textContent=session.user.email||'Usuario';
+  } else {
+    btn.textContent='👤';
+    btn.title='Iniciar sesión';
+    document.getElementById('loginForm').style.display='grid';
+    document.getElementById('loggedInPanel').style.display='none';
+  }
+}
+async function openLogin(){ await refreshAuthUI(); openModal('loginModal'); }
+
+async function signInCloud(){
+  const email=document.getElementById('loginEmail').value.trim();
+  const password=document.getElementById('loginPassword').value;
+  const status=document.getElementById('loginStatus');
+  status.textContent='Entrando...';
+  const { error }=await db.auth.signInWithPassword({email,password});
+  if(error){ status.textContent='Error: '+error.message; return; }
+  status.textContent='Listo.';
+  await refreshAuthUI();
+  setTimeout(()=>closeModal('loginModal'),500);
+}
+async function signOutCloud(){
+  await db.auth.signOut();
+  cloudProjectId=null;
+  await refreshAuthUI();
+  closeModal('loginModal');
+}
+
+async function requireSession(){
+  const { data: { session } } = await db.auth.getSession();
+  if(!session){
+    openLogin();
+    alert('Primero inicia sesión para usar los clientes en la nube.');
+    return null;
+  }
+  return session;
+}
+
+function splitSafe(v){ return (v||'').trim(); }
+
+
+let currentQuoteSaved = false;
+
+function markQuoteUnsaved(){
+  currentQuoteSaved = false;
+  const b=document.getElementById('saveStateBadge');
+  if(b){
+    b.textContent='Sin guardar';
+    b.className='save-state unsaved';
+  }
+}
+function markQuoteSaved(){
+  currentQuoteSaved = true;
+  const b=document.getElementById('saveStateBadge');
+  if(b){
+    b.textContent='✅ Guardado';
+    b.className='save-state saved';
+  }
+}
+function clearQuoteForNext(){
+  document.getElementById('firstName').value='';
+  document.getElementById('lastName').value='';
+  document.getElementById('clientPhone').value='';
+  document.getElementById('project').value='';
+  document.getElementById('estimateNo').value='';
+  document.getElementById('date').value=new Date().toISOString().slice(0,10);
+
+  // Material: dejar los valores vacíos para cada nueva cotización.
+  document.getElementById('slabLength').value='';
+  document.getElementById('slabWidth').value='';
+  document.getElementById('materialPrice').value='';
+  document.getElementById('materialMarkup').value='';
+
+  // Mano de obra y contingencia: empezar en blanco.
+  document.getElementById('laborPrice').value='';
+  document.getElementById('contingency').value='';
+
+  // Conservar la plantilla de piezas y los anchos estándar; borrar solo los largos.
+  pieces=[
+    {area:'Kitchen', type:'kitchen', length:'', width:26, backsplash:true},
+    {area:'Master Bathroom', type:'bathroom', length:'', width:23, backsplash:true},
+    {area:'Main Floor Bathroom', type:'bathroom', length:'', width:23, backsplash:true}
+  ];
+
+  // Conservar nombres e iconos de Extras; borrar cantidades y precios unitarios.
+  extras=[
+    {name:'Bathroom sink', icon:'🛁', qty:'', price:''},
+    {name:'Kitchen sink', icon:'🚰', qty:'', price:''},
+    {name:'Outlet cutout', icon:'🔌', qty:'', price:''},
+    {name:'Full-height backsplash', icon:'▦', qty:'', price:''},
+    {name:'Remnants', icon:'🪨', qty:'', price:''},
+    {name:'Demolition', icon:'🔨', qty:'', price:''},
+    {name:'Cooktop cutout', icon:'▣', qty:'', price:''},
+    {name:'Edge especial', icon:'◩', qty:'', price:''},
+    {name:'Delivery', icon:'🚚', qty:'', price:''}
+  ];
+  cloudProjectId=null;
+
+  renderPieces();
+  renderExtras();
+  calculate();
+  const b=document.getElementById('saveStateBadge');
+  if(b){
+    b.textContent='Nueva cotización';
+    b.className='save-state unsaved';
+  }
+  currentQuoteSaved=false;
+  setTimeout(()=>document.getElementById('firstName').focus(),50);
+}
+
+async function getNextInvoiceNumber(){
+  // Los estimates nuevos usan una secuencia simple: 1, 2, 3... hasta 2,000,000.
+  // Ignoramos números viejos con formato EST-... para poder comenzar la nueva numeración desde 1.
+  const {data,error}=await db.from('projects')
+    .select('estimate_number,created_at')
+    .order('created_at',{ascending:false})
+    .limit(2000);
+  if(error) throw error;
+
+  let maxNo=0;
+  (data||[]).forEach(r=>{
+    const raw=String(r.estimate_number??'').trim();
+    if(/^\d+$/.test(raw)){
+      const n=Number(raw);
+      if(n>=1 && n<=2000000 && n>maxNo) maxNo=n;
+    }
+  });
+
+  let next=maxNo+1;
+  if(next<1) next=1;
+  if(next>2000000) throw new Error('La numeración llegó al límite de 2,000,000.');
+
+  // Evita repetir un número si ya existe.
+  while(next<=2000000){
+    const {data:exists,error:checkErr}=await db.from('projects')
+      .select('id').eq('estimate_number',String(next)).limit(1);
+    if(checkErr) throw checkErr;
+    if(!exists?.length) return String(next);
+    next++;
+  }
+  throw new Error('No hay más números disponibles hasta 2,000,000.');
+}
+
+async function saveCloudQuote(){
+  const session=await requireSession();
+  if(!session) return;
+
+  const firstName=splitSafe(document.getElementById('firstName').value);
+  const lastName=splitSafe(document.getElementById('lastName').value);
+  const phone=splitSafe(document.getElementById('clientPhone').value);
+  const projectName=splitSafe(document.getElementById('project').value);
+  let estimateNo=splitSafe(document.getElementById('estimateNo').value);
+  const projectDate=document.getElementById('date').value;
+
+  if(!firstName || !lastName){ alert('Escribe nombre y apellido del cliente.'); return; }
+  if(!projectName){ alert('Escribe el nombre del proyecto.'); return; }
+
+  // Solo damos un número nuevo cuando ES una cotización nueva.
+  // Si abriste una existente, conserva su mismo número.
+  if(!cloudProjectId && !estimateNo){
+    try{
+      estimateNo=await getNextInvoiceNumber();
+      document.getElementById('estimateNo').value=estimateNo;
+    }catch(e){
+      alert('Error generando el siguiente número: '+e.message);
+      return;
+    }
+  }
+
+  // Find same client first
+  let q=db.from('clients').select('id,first_name,last_name,phone')
+    .ilike('first_name',firstName).ilike('last_name',lastName);
+  if(phone) q=q.eq('phone',phone);
+  const {data:found,error:findErr}=await q.limit(1);
+  if(findErr){ alert('Error buscando cliente: '+findErr.message); return; }
+
+  let clientId;
+  if(found && found.length){
+    clientId=found[0].id;
+  } else {
+    const {data:newClient,error:clientErr}=await db.from('clients')
+      .insert({first_name:firstName,last_name:lastName,phone:phone||null})
+      .select('id').single();
+    if(clientErr){ alert('Error guardando cliente: '+clientErr.message); return; }
+    clientId=newClient.id;
+  }
+
+  const quote=currentQuote();
+  quote.estimateNo=estimateNo;
+  quote.saved_by=session.user.email||'';
+  quote.saved_at=new Date().toISOString();
+
+  if(cloudProjectId){
+    // PROYECTO EXISTENTE: actualizar el mismo folder, no crear otro.
+    const {error:projectErr}=await db.from('projects')
+      .update({client_id:clientId,project_name:projectName,estimate_number:estimateNo,project_date:projectDate||null})
+      .eq('id',cloudProjectId);
+    if(projectErr){
+      alert('No pude actualizar el proyecto existente. Supabase necesita permiso UPDATE en la tabla projects. Error: '+projectErr.message);
+      return;
+    }
+
+    // V2.7.3: mantener UNA sola versión de datos por proyecto.
+    // Primero buscamos todos los registros existentes de este project_id.
+    const {data:dataRows,error:dataFindErr}=await db.from('project_data')
+      .select('id,created_at')
+      .eq('project_id',cloudProjectId)
+      .order('created_at',{ascending:false});
+    if(dataFindErr){
+      alert('Proyecto actualizado, pero no pude revisar sus versiones: '+dataFindErr.message);
+      return;
+    }
+
+    if(dataRows?.length){
+      // Actualizar el registro más reciente en vez de insertar una copia nueva.
+      const keepId=dataRows[0].id;
+      const {error:dataUpdateErr}=await db.from('project_data')
+        .update({data:quote})
+        .eq('id',keepId);
+      if(dataUpdateErr){
+        alert('No pude reemplazar los datos del proyecto. Falta permiso UPDATE en project_data. Error: '+dataUpdateErr.message);
+        return;
+      }
+
+      // Si quedaron versiones antiguas de V2.7.2 o anteriores, eliminarlas.
+      const oldIds=dataRows.slice(1).map(r=>r.id);
+      if(oldIds.length){
+        const {error:deleteErr}=await db.from('project_data')
+          .delete()
+          .in('id',oldIds);
+        if(deleteErr){
+          alert('Los datos nuevos sí se guardaron, pero no pude borrar '+oldIds.length+' versión(es) vieja(s). Ejecuta el permiso/limpieza V2.7.3 en Supabase. Error: '+deleteErr.message);
+          markQuoteSaved();
+          return;
+        }
+      }
+    } else {
+      // Proyecto antiguo sin project_data: crear su único registro.
+      const {error:dataInsertErr}=await db.from('project_data')
+        .insert({project_id:cloudProjectId,data:quote});
+      if(dataInsertErr){
+        alert('Proyecto actualizado, pero hubo error creando sus datos: '+dataInsertErr.message);
+        return;
+      }
+    }
+
+    markQuoteSaved();
+    alert('✅ Proyecto actualizado. Quedó una sola versión vigente en el folder del cliente.');
+    return;
+  }
+
+  // COTIZACIÓN NUEVA: crear un folder/proyecto nuevo.
+  const {data:newProject,error:projectErr}=await db.from('projects')
+    .insert({client_id:clientId,project_name:projectName,estimate_number:estimateNo,project_date:projectDate||null})
+    .select('id').single();
+  if(projectErr){ alert('Error guardando proyecto: '+projectErr.message); return; }
+
+  const {error:dataErr}=await db.from('project_data')
+    .insert({project_id:newProject.id,data:quote});
+  if(dataErr){ alert('Proyecto creado, pero hubo error guardando los datos: '+dataErr.message); return; }
+
+  cloudProjectId=newProject.id;
+  markQuoteSaved();
+  alert('✅ Cliente y estimate #'+estimateNo+' guardados en la nube. La pantalla se limpiará para la siguiente cotización.');
+  clearQuoteForNext();
+}
+
+async function openClientSearch(){
+  const session=await requireSession();
+  if(!session) return;
+  document.getElementById('clientSearchInput').value='';
+  document.getElementById('clientSearchResults').innerHTML='<div class="result-sub">Empieza a escribir para buscar clientes.</div>';
+  openModal('clientSearchModal');
+  setTimeout(()=>document.getElementById('clientSearchInput').focus(),100);
+}
+function searchClientsDebounced(){
+  clearTimeout(searchTimer);
+  searchTimer=setTimeout(searchClients,280);
+}
+
+async function searchClients(){
+  const term=splitSafe(document.getElementById('clientSearchInput').value);
+  const box=document.getElementById('clientSearchResults');
+  if(term.length<1){ box.innerHTML='<div class="result-sub">Empieza a escribir para buscar clientes.</div>'; return; }
+
+  // Search first name, last name, and phone
+  const safe=term.replaceAll(',',' ');
+  const filter=`first_name.ilike.%${safe}%,last_name.ilike.%${safe}%,phone.ilike.%${safe}%`;
+  const {data,error}=await db.from('clients')
+    .select('id,first_name,last_name,phone')
+    .or(filter)
+    .order('last_name')
+    .limit(20);
+
+  if(error){ box.innerHTML='<div class="result-sub">Error: '+error.message+'</div>'; return; }
+  if(!data?.length){ box.innerHTML='<div class="result-sub">No encontré clientes con ese nombre.</div>'; return; }
+
+  box.innerHTML='';
+  for(const c of data){
+    const item=document.createElement('div');
+    item.className='result-item';
+    item.innerHTML=`<div class="result-name">👤 ${c.first_name||''} ${c.last_name||''}</div>
+      <div class="result-sub">${c.phone||'Sin teléfono'}</div>
+      <div class="project-list" id="client-projects-${c.id}" style="display:none"></div>`;
+    item.onclick=()=>toggleClientProjects(c,item);
+    box.appendChild(item);
+  }
+}
+
+async function toggleClientProjects(client,item){
+  const list=document.getElementById('client-projects-'+client.id);
+  if(list.style.display==='block'){ list.style.display='none'; return; }
+
+  list.style.display='block';
+  list.innerHTML='<div class="result-sub">Cargando proyectos...</div>';
+
+  const {data,error}=await db.from('projects')
+    .select('id,project_name,estimate_number,project_date,created_at')
+    .eq('client_id',client.id)
+    .order('created_at',{ascending:false});
+
+  if(error){ list.innerHTML='<div class="result-sub">Error: '+error.message+'</div>'; return; }
+  if(!data?.length){ list.innerHTML='<div class="result-sub">Este cliente todavía no tiene estimates.</div>'; return; }
+
+  list.innerHTML='';
+  for(const p of data){
+    const el=document.createElement('div');
+    el.className='project-item';
+    el.innerHTML=`<strong>${p.project_name||'Proyecto'}</strong>
+      <div class="result-sub">${p.estimate_number||'Sin estimate #'} · ${p.project_date||''}</div>`;
+    el.onclick=(ev)=>{ev.stopPropagation();loadCloudProject(client,p);};
+    list.appendChild(el);
+  }
+}
+
+async function loadCloudProject(client,project){
+  const {data,error}=await db.from('project_data')
+    .select('data')
+    .eq('project_id',project.id)
+    .order('created_at',{ascending:false})
+    .limit(1)
+    .maybeSingle();
+
+  if(error){ alert('Error abriendo estimate: '+error.message); return; }
+  if(!data?.data){ alert('Este proyecto no tiene datos de calculadora guardados.'); return; }
+
+  const q=data.data;
+  document.getElementById('firstName').value=client.first_name||'';
+  document.getElementById('lastName').value=client.last_name||'';
+  document.getElementById('clientPhone').value=client.phone||'';
+  document.getElementById('project').value=project.project_name||'';
+  document.getElementById('estimateNo').value=project.estimate_number||'';
+  document.getElementById('date').value=project.project_date||new Date().toISOString().slice(0,10);
+
+  if(q.slabLength!=null) document.getElementById('slabLength').value=q.slabLength;
+  if(q.slabWidth!=null) document.getElementById('slabWidth').value=q.slabWidth;
+  if(q.materialPrice!=null) document.getElementById('materialPrice').value=q.materialPrice;
+  if(q.materialMarkup!=null) document.getElementById('materialMarkup').value=q.materialMarkup;
+  if(q.laborPrice!=null) document.getElementById('laborPrice').value=q.laborPrice;
+  if(q.contingency!=null) document.getElementById('contingency').value=q.contingency;
+
+  if(Array.isArray(q.pieces)) pieces=q.pieces;
+  if(Array.isArray(q.extras)) extras=q.extras;
+  cloudProjectId=project.id;
+
+  renderPieces();
+  renderExtras();
+  calculate();
+  closeModal('clientSearchModal');
+  alert('✅ Estimate abierto desde la nube.');
+}
+
+
+function newCloudQuote(){
+  const hasData =
+    (document.getElementById('firstName').value||'').trim() ||
+    (document.getElementById('lastName').value||'').trim() ||
+    (document.getElementById('project').value||'').trim() ||
+    (document.getElementById('slabLength').value||'').trim() ||
+    pieces.length || extras.length;
+
+  if(hasData && !currentQuoteSaved){
+    const ok=confirm('¿Crear una nueva cotización? Los datos que no hayas guardado se borrarán de la pantalla.');
+    if(!ok) return;
+  }
+  clearQuoteForNext();
+}
+
+
+['firstName','lastName','clientPhone','project','estimateNo','date','slabLength','slabWidth','materialPrice','materialMarkup','laborPrice','contingency']
+.forEach(id=>{
+  const el=document.getElementById(id);
+  if(el) el.addEventListener('input', markQuoteUnsaved);
+});
+
+db.auth.onAuthStateChange(()=>refreshAuthUI());
+setTimeout(refreshAuthUI,0);
+
 </script>
-</body></html>
+</body>
+</html>
