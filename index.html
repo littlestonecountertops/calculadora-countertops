@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Little Stone Countertops - Calculadora v3.2 Cloud</title>
+<title>Little Stone Countertops - Calculadora v3.5 Cloud</title>
 <style>
 :root{
   --bg:#f4f5f7; --card:#ffffff; --line:#e4e7ec; --text:#16181d; --muted:#667085;
@@ -168,6 +168,14 @@ input:disabled{background:#f2f4f7;color:#667085}
 @media(max-width:700px){.slabs-table{min-width:1120px}}
 
 .blank-note{font-size:11px;color:#667085;margin-top:7px}
+
+.extra-service input[type="text"]{min-width:0;width:100%}
+
+.extras-table{width:100%;border-collapse:collapse;min-width:760px}
+.extras-table th,.extras-table td{padding:7px 8px;border-bottom:1px solid #eef1f4;vertical-align:middle}
+.extras-table th{background:#f8fafc;color:#475467;font-size:12px}
+.extras-table input,.extras-table select{padding:7px 8px;font-size:13px}
+@media(max-width:700px){.extras-table{min-width:820px}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -176,7 +184,7 @@ input:disabled{background:#f2f4f7;color:#667085}
 
   <div class="topbar">
     <div class="brand">LITTLE STONE<small>COUNTERTOPS</small></div>
-    <div class="title">Calculadora v3.2 Cloud</div>
+    <div class="title">Calculadora v3.5 Cloud</div>
     <div class="top-actions">
       <span id="saveStateBadge" class="save-state unsaved">Nueva cotización</span>
       <button class="newquote-btn" onclick="newCloudQuote()" title="Nueva cotización">➕ Nueva cotización</button>
@@ -267,9 +275,9 @@ input:disabled{background:#f2f4f7;color:#667085}
   <section class="card">
     <div class="pieces-head">
       <div class="section-title" style="margin:0">4. ＋ EXTRAS</div>
-      <button class="btn light" onclick="addCustomExtra()">＋ Agregar nota</button>
+      <button class="btn purple" onclick="addExtraRow()">＋ Agregar extra</button>
     </div>
-    <div class="extras-grid" id="extrasGrid"></div>
+    <div id="extrasGrid"></div>
     <div class="total-extras"><span>Total extras:</span><span style="color:var(--green)" id="extrasTotal">$0.00</span></div>
   </section>
 
@@ -391,21 +399,30 @@ let pieces = [
   {area:"Main Bath", customArea:"", type:"bathroom", length:'', width:23, backsplash:true}
 ];
 
-const EXTRA_TEMPLATE = [
-  {name:"Bathroom sink", icon:"🛁"},
-  {name:"Kitchen sink", icon:"🚰"},
-  {name:"Outlet cutout", icon:"🔌"},
-  {name:"Full-height backsplash", icon:"▦"},
-  {name:"Remnants", icon:"🪨"},
-  {name:"Demolition", icon:"🔨"},
-  {name:"Cooktop cutout", icon:"▣"},
-  {name:"Edge especial", icon:"◩"},
-  {name:"Delivery", icon:"🚚"}
+const EXTRA_OPTIONS = [
+  "Bathroom sink",
+  "Kitchen sink",
+  "Outlet cutout",
+  "Full-height backsplash",
+  "Remnants",
+  "Demolition",
+  "Cooktop cutout",
+  "Edge especial",
+  "Delivery",
+  "Custom / Otro"
 ];
+
 function blankExtras(){
-  return EXTRA_TEMPLATE.map(x=>({...x,qty:'',price:''}));
+  return [];
 }
-let extras = blankExtras();
+
+let extras = [];
+
+function extraDisplayName(e){
+  return e.service === "Custom / Otro"
+    ? ((e.customName||"").trim() || "Custom / Otro")
+    : (e.service || "");
+}
 
 function pieceDisplayName(p){
   return p.area==="Custom / Otro" ? ((p.customArea||"").trim() || "Custom") : (p.area||"");
@@ -483,30 +500,88 @@ function removePiece(i){ pieces.splice(i,1); renderPieces(); }
 function renderExtras(){
   const grid = document.getElementById('extrasGrid');
   grid.innerHTML = "";
-  const left = extras.slice(0,4), right = extras.slice(4);
-  [left,right].forEach(group=>{
-    const col = document.createElement('div');
-    col.innerHTML = `<div class="extra-head"><div>Servicio</div><div>Cant.</div><div>Precio unit.</div><div>Total</div></div>`;
-    group.forEach(ex=>{
-      const idx = extras.indexOf(ex);
-      const row = document.createElement('div');
-      row.className = "extra-row";
-      row.innerHTML = `
-        <div class="extra-service"><span>${ex.icon}</span><span>${ex.name}</span></div>
-        <input type="number" min="0" step="1" value="${ex.qty}" oninput="extras[${idx}].qty=this.value;calculate()">
-        <input type="number" step="0.01" value="${ex.price}" oninput="extras[${idx}].price=this.value;calculate()">
-        <div class="extra-total" id="extra-${idx}">$0.00</div>`;
-      col.appendChild(row);
-    });
-    grid.appendChild(col);
+
+  if(!extras.length){
+    grid.innerHTML = '<div class="result-sub" style="padding:8px 2px">No hay extras agregados.</div>';
+    document.getElementById('extrasTotal').textContent = money(0);
+    return;
+  }
+
+  const tableWrap = document.createElement('div');
+  tableWrap.className = 'table-wrap';
+  tableWrap.innerHTML = `
+    <table class="extras-table">
+      <thead>
+        <tr>
+          <th>Servicio</th>
+          <th>Descripción</th>
+          <th>Cant.</th>
+          <th>Precio unit.</th>
+          <th>Total</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="extrasBody"></tbody>
+    </table>`;
+
+  grid.appendChild(tableWrap);
+  const body = tableWrap.querySelector('#extrasBody');
+
+  extras.forEach((ex,i)=>{
+    if(!ex.service) ex.service = EXTRA_OPTIONS[0];
+    if(typeof ex.customName === 'undefined') ex.customName = '';
+    if(typeof ex.qty === 'undefined') ex.qty = '';
+    if(typeof ex.price === 'undefined') ex.price = '';
+
+    const options = EXTRA_OPTIONS.map(opt =>
+      `<option value="${opt}" ${opt===ex.service?'selected':''}>${opt}</option>`
+    ).join('');
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>
+        <select onchange="changeExtraService(${i},this.value)">
+          ${options}
+        </select>
+      </td>
+      <td>
+        ${ex.service==="Custom / Otro"
+          ? `<input type="text" value="${ex.customName ?? ''}" placeholder="Escribe el trabajo" oninput="extras[${i}].customName=this.value;markQuoteUnsaved()">`
+          : `<span class="result-sub">${ex.service}</span>`}
+      </td>
+      <td><input type="number" min="0" step="1" value="${ex.qty ?? ''}" placeholder="Cant." oninput="extras[${i}].qty=this.value;calculate();markQuoteUnsaved()"></td>
+      <td><input type="number" step="0.01" value="${ex.price ?? ''}" placeholder="$" oninput="extras[${i}].price=this.value;calculate();markQuoteUnsaved()"></td>
+      <td class="extra-total" id="extra-${i}">$0.00</td>
+      <td><button class="smallbtn del" onclick="removeExtra(${i})">🗑</button></td>`;
+    body.appendChild(tr);
   });
+
   calculate();
 }
-function addCustomExtra(){
-  const name = prompt("Nombre del servicio:");
-  if(!name) return;
-  extras.push({name,icon:"＋",qty:'',price:''});
+
+function addExtraRow(){
+  extras.push({
+    service: EXTRA_OPTIONS[0],
+    customName: '',
+    qty: '',
+    price: ''
+  });
   renderExtras();
+  markQuoteUnsaved();
+}
+
+function changeExtraService(i, service){
+  extras[i].service = service;
+  if(service !== "Custom / Otro") extras[i].customName = '';
+  renderExtras();
+  markQuoteUnsaved();
+}
+
+function removeExtra(i){
+  extras.splice(i,1);
+  renderExtras();
+  calculate();
+  markQuoteUnsaved();
 }
 
 function calculate(){
@@ -754,7 +829,7 @@ function clearQuoteForNext(){
     {area:"Master Bath", customArea:"", type:"bathroom", length:'', width:23, backsplash:true},
     {area:"Main Bath", customArea:"", type:"bathroom", length:'', width:23, backsplash:true}
   ];
-  extras=blankExtras();
+  extras=[];
   cloudProjectId=null;
 
   renderSlabs();
@@ -922,7 +997,13 @@ async function loadCloudProject(client,project){
   if(q.contingency!=null) document.getElementById('contingency').value=q.contingency;
 
   if(Array.isArray(q.pieces)) pieces=q.pieces;
-  if(Array.isArray(q.extras)) extras=q.extras;
+  if(Array.isArray(q.extras)){
+    extras = q.extras.map(e=>{
+      if(e.service) return e;
+      if(e.custom) return {service:"Custom / Otro",customName:e.customName||e.name||"",qty:e.qty??"",price:e.price??""};
+      return {service:e.name||"Custom / Otro",customName:"",qty:e.qty??"",price:e.price??""};
+    });
+  }
   cloudProjectId=project.id;
 
   renderSlabs();
