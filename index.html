@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Little Stone Countertops - Calculadora v2.7.3 Cloud</title>
+<title>Little Stone Countertops - Calculadora v3.0 Cloud</title>
 <style>
 :root{
   --bg:#f4f5f7; --card:#ffffff; --line:#e4e7ec; --text:#16181d; --muted:#667085;
@@ -161,49 +161,22 @@ input:disabled{background:#f2f4f7;color:#667085}
 .save-state.unsaved{background:#fff7ed;color:#9a3412;border:1px solid #fed7aa}
 .save-state.saved{background:#ecfdf3;color:#166534;border:1px solid #bbf7d0}
 @media(max-width:700px){.save-state{font-size:10px;padding:4px 7px}}
+
+.slabs-table input{min-width:84px}
+.slabs-table td,.slabs-table th{white-space:nowrap}
+.slabs-table .del-slab{border:1px solid #fecaca;background:#fff;color:#dc2626;border-radius:7px;padding:6px 8px;cursor:pointer}
+@media(max-width:700px){.slabs-table{min-width:980px}}
+
+.blank-note{font-size:11px;color:#667085;margin-top:7px}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<style id="v273-mobile-hardening">
-/* Mobile/iPad hardening. No business logic changes. */
-html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
-body{min-height:100dvh}
-button,input,select{-webkit-tap-highlight-color:transparent}
-button,.btn,.iconbtn,.newquote-btn,.smallbtn,.matbtn{touch-action:manipulation}
-.table-wrap{-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
-.modal{max-height:min(88vh,88dvh)}
-@media(max-width:700px){
-  input,select{font-size:16px}
-  td input,td select,.extra-row input{font-size:16px}
-  .top-actions{flex-wrap:wrap;align-items:center;gap:6px}
-  .iconbtn,.newquote-btn,.btn,.smallbtn{min-height:44px}
-  .iconbtn{min-width:44px}
-  .newquote-btn{padding:9px 10px;font-size:12px}
-  .save-state{min-height:32px;display:inline-flex;align-items:center}
-  .modal-backdrop{padding:max(8px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left))}
-  .modal{max-height:92dvh}
-}
-@media(max-width:480px){
-  .app{padding-left:max(5px,env(safe-area-inset-left));padding-right:max(5px,env(safe-area-inset-right))}
-  .topbar{grid-template-columns:1fr;grid-template-areas:"brand" "title" "actions";gap:7px;top:0}
-  .top-actions{justify-content:flex-start;width:100%}
-  .grid4,.cloud-meta{grid-template-columns:1fr}
-  .material-row{grid-template-columns:1fr 1fr}
-  .action-grid{grid-template-columns:1fr}
-  .pieces-head{gap:8px;align-items:flex-start;flex-wrap:wrap}
-  .extra-head,.extra-row{grid-template-columns:minmax(110px,1.35fr) minmax(54px,.55fr) minmax(82px,.8fr) minmax(76px,.7fr)}
-  .extra-service{font-size:12px}
-  .grand{padding:12px;gap:8px}
-}
-</style>
-
 </head>
 <body>
 <div class="app">
 
   <div class="topbar">
     <div class="brand">LITTLE STONE<small>COUNTERTOPS</small></div>
-    <div class="title">Calculadora v2.7.3 Cloud</div>
+    <div class="title">Calculadora v3.0 Cloud</div>
     <div class="top-actions">
       <span id="saveStateBadge" class="save-state unsaved">Nueva cotización</span>
       <button class="newquote-btn" onclick="newCloudQuote()" title="Nueva cotización">➕ Nueva cotización</button>
@@ -226,38 +199,27 @@ button,.btn,.iconbtn,.newquote-btn,.smallbtn,.matbtn{touch-action:manipulation}
   </section>
 
   <section class="card">
-    <div class="section-title">🪨 MATERIAL / SLAB</div>
-    <div class="grid4">
-      <div>
-        <label>Largo del slab (pulgadas)</label>
-        <input id="slabLength" type="number" step="0.01" value="" oninput="calculate()">
-      </div>
-      <div>
-        <label>Ancho del slab (pulgadas)</label>
-        <input id="slabWidth" type="number" step="0.01" value="" oninput="calculate()">
-      </div>
-      <div>
-        <label>Costo material ($ / sqft)</label>
-        <input id="materialPrice" type="number" step="0.01" value="" oninput="calculate()">
-      </div>
-      <div>
-        <label>Recargo / desperdicio (%)</label>
-        <input id="materialMarkup" type="number" step="0.1" value="" oninput="calculate()">
-      </div>
+    <div class="pieces-head">
+      <div class="section-title" style="margin:0">🪨 MATERIAL / SLABS</div>
+      <button class="btn purple" onclick="addSlab()">＋ Agregar slab</button>
+    </div>
+    <div class="blank-note">Nueva cotización: los campos de medidas, cantidades y precios empiezan en blanco.</div>
+    <div class="table-wrap">
+      <table class="slabs-table">
+        <thead>
+          <tr><th>#</th><th>Largo (in)</th><th>Ancho (in)</th><th>Cantidad</th><th>Costo $/sqft</th><th>Recargo %</th><th>SQFT c/u</th><th>SQFT total</th><th>Costo final</th><th>Acciones</th></tr>
+        </thead>
+        <tbody id="slabsBody"></tbody>
+        <tfoot>
+          <tr><td colspan="7" class="num">Total material:</td><td id="slabsTotalSqft">0.00 sqft</td><td class="green" id="slabsGrandTotal">$0.00</td><td></td></tr>
+        </tfoot>
+      </table>
     </div>
     <div class="grid4" style="margin-top:10px">
-      <div class="summary-card">
-        <div class="summary-row total"><span>SQFT por slab</span><strong id="slabSqft">0.00 sqft</strong></div>
-      </div>
-      <div class="summary-card">
-        <div class="summary-row total"><span>Costo base</span><strong id="slabBase">$0.00</strong></div>
-      </div>
-      <div class="summary-card">
-        <div class="summary-row total"><span>Recargo</span><strong id="slabMarkupCost">$0.00</strong></div>
-      </div>
-      <div class="summary-card">
-        <div class="summary-row total"><span>Costo final slab</span><span class="green" id="slabFinal">$0.00</span></div>
-      </div>
+      <div class="summary-card"><div class="summary-row"><span>Total de slabs</span><strong id="slabsCountSummary">0</strong></div></div>
+      <div class="summary-card"><div class="summary-row"><span>SQFT total material</span><strong id="slabTotalSqft">0.00 sqft</strong></div></div>
+      <div class="summary-card"><div class="summary-row"><span>Recargo total</span><strong id="slabMarkupCost">$0.00</strong></div></div>
+      <div class="summary-card"><div class="summary-row total"><span>Costo final material</span><span class="green" id="slabFinal">$0.00</span></div></div>
     </div>
   </section>
 
@@ -283,10 +245,10 @@ button,.btn,.iconbtn,.newquote-btn,.smallbtn,.matbtn{touch-action:manipulation}
     <section class="card">
       <div class="section-title">🪨 2. COSTO DEL MATERIAL</div>
       <div class="summary-card">
-        <div class="summary-row"><span>SQFT por slab</span><strong id="matSqft">0.00 sqft</strong></div>
-        <div class="summary-row"><span>Costo material por sqft</span><strong id="matPriceSummary">$0.00</strong></div>
-        <div class="summary-row"><span>Recargo / desperdicio</span><strong id="matMarkupSummary">0%</strong></div>
-        <div class="summary-row total"><span>Costo final del slab</span><span class="green" id="matTotal">$0.00</span></div>
+        <div class="summary-row"><span>Total de slabs</span><strong id="matSlabCount">0</strong></div>
+        <div class="summary-row"><span>SQFT total material</span><strong id="matSqft">0.00 sqft</strong></div>
+        <div class="summary-row"><span>Recargo total</span><strong id="matMarkupSummary">$0.00</strong></div>
+        <div class="summary-row total"><span>Costo final material</span><span class="green" id="matTotal">$0.00</span></div>
       </div>
     </section>
 
@@ -373,23 +335,64 @@ const areaOptions = [
   "Laundry Room","Bar","Pantry","Other"
 ];
 
-let pieces = [
-  {area:"Kitchen", type:"kitchen", length:"", width:26, backsplash:true},
-  {area:"Master Bathroom", type:"bathroom", length:"", width:23, backsplash:true},
-  {area:"Main Floor Bathroom", type:"bathroom", length:"", width:23, backsplash:true}
+let slabs = [
+  {length:'', width:'', qty:'', price:'', markup:''}
 ];
 
-let extras = [
-  {name:"Bathroom sink", icon:"🛁", qty:"", price:""},
-  {name:"Kitchen sink", icon:"🚰", qty:"", price:""},
-  {name:"Outlet cutout", icon:"🔌", qty:"", price:""},
-  {name:"Full-height backsplash", icon:"▦", qty:"", price:""},
-  {name:"Remnants", icon:"🪨", qty:"", price:""},
-  {name:"Demolition", icon:"🔨", qty:"", price:""},
-  {name:"Cooktop cutout", icon:"▣", qty:"", price:""},
-  {name:"Edge especial", icon:"◩", qty:"", price:""},
-  {name:"Delivery", icon:"🚚", qty:"", price:""}
+function renderSlabs(){
+  const body=document.getElementById('slabsBody');
+  if(!body) return;
+  body.innerHTML='';
+  slabs.forEach((s,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td>${i+1}</td>
+      <td><input type="number" step="0.01" value="${s.length ?? ''}" placeholder="Largo" oninput="slabs[${i}].length=this.value;calculate();markQuoteUnsaved()"></td>
+      <td><input type="number" step="0.01" value="${s.width ?? ''}" placeholder="Ancho" oninput="slabs[${i}].width=this.value;calculate();markQuoteUnsaved()"></td>
+      <td><input type="number" min="1" step="1" value="${s.qty ?? ''}" placeholder="Cant." oninput="slabs[${i}].qty=this.value;calculate();markQuoteUnsaved()"></td>
+      <td><input type="number" step="0.01" value="${s.price ?? ''}" placeholder="$ / sqft" oninput="slabs[${i}].price=this.value;calculate();markQuoteUnsaved()"></td>
+      <td><input type="number" step="0.1" value="${s.markup ?? ''}" placeholder="%" oninput="slabs[${i}].markup=this.value;calculate();markQuoteUnsaved()"></td>
+      <td id="slab-each-${i}">0.00</td>
+      <td id="slab-total-${i}">0.00</td>
+      <td class="green" id="slab-cost-${i}">$0.00</td>
+      <td><button class="del-slab" onclick="removeSlab(${i})">🗑</button></td>`;
+    body.appendChild(tr);
+  });
+  calculate();
+}
+function addSlab(){
+  slabs.push({length:'',width:'',qty:'',price:'',markup:''});
+  renderSlabs();
+  markQuoteUnsaved();
+}
+function removeSlab(i){
+  slabs.splice(i,1);
+  if(!slabs.length) slabs.push({length:'',width:'',qty:'',price:'',markup:''});
+  renderSlabs();
+  markQuoteUnsaved();
+}
+
+let pieces = [
+  {area:"Kitchen", type:"kitchen", length:'', width:26, backsplash:true},
+  {area:"Master Bathroom", type:"bathroom", length:'', width:23, backsplash:true},
+  {area:"Main Floor Bathroom", type:"bathroom", length:'', width:23, backsplash:true}
 ];
+
+const EXTRA_TEMPLATE = [
+  {name:"Bathroom sink", icon:"🛁"},
+  {name:"Kitchen sink", icon:"🚰"},
+  {name:"Outlet cutout", icon:"🔌"},
+  {name:"Full-height backsplash", icon:"▦"},
+  {name:"Remnants", icon:"🪨"},
+  {name:"Demolition", icon:"🔨"},
+  {name:"Cooktop cutout", icon:"▣"},
+  {name:"Edge especial", icon:"◩"},
+  {name:"Delivery", icon:"🚚"}
+];
+function blankExtras(){
+  return EXTRA_TEMPLATE.map(x=>({...x,qty:'',price:''}));
+}
+let extras = blankExtras();
 
 function money(v){
   return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(Number(v)||0);
@@ -424,7 +427,7 @@ function renderPieces(){
       <td>${i+1}</td>
       <td><select onchange="pieces[${i}].area=this.value;saveTemp()">${opts}</select></td>
       <td><select onchange="changePieceType(${i},this.value)">${typeOpts}</select></td>
-      <td><input type="number" step="0.01" value="${p.length}" oninput="pieces[${i}].length=this.value;calculate()"></td>
+      <td><input type="number" step="0.01" value="${p.length ?? ''}" oninput="pieces[${i}].length=this.value;calculate()"></td>
       <td><input type="number" step="0.01" value="${p.width}" ${p.type!=="custom"?'disabled':''} oninput="pieces[${i}].width=this.value;calculate()"></td>
       <td style="text-align:center"><input type="checkbox" ${p.backsplash?'checked':''} onchange="pieces[${i}].backsplash=this.checked;calculate()" style="width:18px;height:18px"></td>
       <td id="top-${i}">0.00</td>
@@ -477,22 +480,27 @@ function renderExtras(){
 function addCustomExtra(){
   const name = prompt("Nombre del servicio:");
   if(!name) return;
-  extras.push({name,icon:"＋",qty:1,price:0});
+  extras.push({name,icon:"＋",qty:'',price:''});
   renderExtras();
 }
 
 function calculate(){
-  const slabL = Number(document.getElementById('slabLength').value)||0;
-  const slabW = Number(document.getElementById('slabWidth').value)||0;
-  const mp = Number(document.getElementById('materialPrice').value)||0;
-  const markup = Number(document.getElementById('materialMarkup').value)||0;
   const lp = Number(document.getElementById('laborPrice').value)||0;
   const contingency = Number(document.getElementById('contingency').value)||0;
 
-  const slabSq = (slabL*slabW)/144;
-  const slabBase = slabSq*mp;
-  const slabMarkupCost = slabBase*(markup/100);
-  const materialTotal = slabBase+slabMarkupCost;
+  let slabTotalSq=0, slabBase=0, slabMarkupCost=0, materialTotal=0, slabCount=0;
+  slabs.forEach((s,i)=>{
+    const l=Number(s.length)||0, w=Number(s.width)||0;
+    const qty=Math.max(0,Math.floor(Number(s.qty)||0));
+    const price=Number(s.price)||0, markup=Number(s.markup)||0;
+    const eachSq=(l*w)/144, totalSq=eachSq*qty;
+    const base=totalSq*price, recargo=base*(markup/100), total=base+recargo;
+    slabCount+=qty; slabTotalSq+=totalSq; slabBase+=base; slabMarkupCost+=recargo; materialTotal+=total;
+    const a=document.getElementById(`slab-each-${i}`), b=document.getElementById(`slab-total-${i}`), c=document.getElementById(`slab-cost-${i}`);
+    if(a) a.textContent=eachSq.toFixed(2);
+    if(b) b.textContent=totalSq.toFixed(2);
+    if(c) c.textContent=money(total);
+  });
 
   let totalSq = 0;
   let totalTopSq = 0;
@@ -527,17 +535,19 @@ function calculate(){
 
   const grand = subtotalCont + extrasTotal;
 
-  document.getElementById('slabSqft').textContent = slabSq.toFixed(2)+" sqft";
-  document.getElementById('slabBase').textContent = money(slabBase);
+  document.getElementById('slabsCountSummary').textContent = slabCount;
+  document.getElementById('slabsTotalSqft').textContent = slabTotalSq.toFixed(2)+" sqft";
+  document.getElementById('slabsGrandTotal').textContent = money(materialTotal);
+  document.getElementById('slabTotalSqft').textContent = slabTotalSq.toFixed(2)+" sqft";
   document.getElementById('slabMarkupCost').textContent = money(slabMarkupCost);
   document.getElementById('slabFinal').textContent = money(materialTotal);
 
   document.getElementById('topSqftTotal').textContent = totalTopSq.toFixed(2);
   document.getElementById('bsSqftTotal').textContent = totalBsSq.toFixed(2);
   document.getElementById('totalSqft').textContent = totalSq.toFixed(2)+" sqft";
-  document.getElementById('matSqft').textContent = slabSq.toFixed(2)+" sqft";
-  document.getElementById('matPriceSummary').textContent = money(mp);
-  document.getElementById('matMarkupSummary').textContent = markup.toFixed(1).replace('.0','')+"%";
+  document.getElementById('matSlabCount').textContent = slabCount;
+  document.getElementById('matSqft').textContent = slabTotalSq.toFixed(2)+" sqft";
+  document.getElementById('matMarkupSummary').textContent = money(slabMarkupCost);
   document.getElementById('matTotal').textContent = money(materialTotal);
   document.getElementById('laborTotal').textContent = money(laborTotal);
   document.getElementById('subtotal').textContent = money(subtotal);
@@ -555,10 +565,7 @@ function currentQuote(){
     project:document.getElementById('project').value,
     estimateNo:document.getElementById('estimateNo').value,
     date:document.getElementById('date').value,
-    slabLength:document.getElementById('slabLength').value,
-    slabWidth:document.getElementById('slabWidth').value,
-    materialPrice:document.getElementById('materialPrice').value,
-    materialMarkup:document.getElementById('materialMarkup').value,
+    slabs,
     laborPrice:document.getElementById('laborPrice').value,
     contingency:document.getElementById('contingency').value,
     pieces, extras
@@ -713,37 +720,19 @@ function clearQuoteForNext(){
   document.getElementById('estimateNo').value='';
   document.getElementById('date').value=new Date().toISOString().slice(0,10);
 
-  // Material: dejar los valores vacíos para cada nueva cotización.
-  document.getElementById('slabLength').value='';
-  document.getElementById('slabWidth').value='';
-  document.getElementById('materialPrice').value='';
-  document.getElementById('materialMarkup').value='';
-
-  // Mano de obra y contingencia: empezar en blanco.
   document.getElementById('laborPrice').value='';
   document.getElementById('contingency').value='';
 
-  // Conservar la plantilla de piezas y los anchos estándar; borrar solo los largos.
+  slabs=[{length:'',width:'',qty:'',price:'',markup:''}];
   pieces=[
-    {area:'Kitchen', type:'kitchen', length:'', width:26, backsplash:true},
-    {area:'Master Bathroom', type:'bathroom', length:'', width:23, backsplash:true},
-    {area:'Main Floor Bathroom', type:'bathroom', length:'', width:23, backsplash:true}
+    {area:"Kitchen", type:"kitchen", length:'', width:26, backsplash:true},
+    {area:"Master Bathroom", type:"bathroom", length:'', width:23, backsplash:true},
+    {area:"Main Floor Bathroom", type:"bathroom", length:'', width:23, backsplash:true}
   ];
-
-  // Conservar nombres e iconos de Extras; borrar cantidades y precios unitarios.
-  extras=[
-    {name:'Bathroom sink', icon:'🛁', qty:'', price:''},
-    {name:'Kitchen sink', icon:'🚰', qty:'', price:''},
-    {name:'Outlet cutout', icon:'🔌', qty:'', price:''},
-    {name:'Full-height backsplash', icon:'▦', qty:'', price:''},
-    {name:'Remnants', icon:'🪨', qty:'', price:''},
-    {name:'Demolition', icon:'🔨', qty:'', price:''},
-    {name:'Cooktop cutout', icon:'▣', qty:'', price:''},
-    {name:'Edge especial', icon:'◩', qty:'', price:''},
-    {name:'Delivery', icon:'🚚', qty:'', price:''}
-  ];
+  extras=blankExtras();
   cloudProjectId=null;
 
+  renderSlabs();
   renderPieces();
   renderExtras();
   calculate();
@@ -754,39 +743,6 @@ function clearQuoteForNext(){
   }
   currentQuoteSaved=false;
   setTimeout(()=>document.getElementById('firstName').focus(),50);
-}
-
-async function getNextInvoiceNumber(){
-  // Los estimates nuevos usan una secuencia simple: 1, 2, 3... hasta 2,000,000.
-  // Ignoramos números viejos con formato EST-... para poder comenzar la nueva numeración desde 1.
-  const {data,error}=await db.from('projects')
-    .select('estimate_number,created_at')
-    .order('created_at',{ascending:false})
-    .limit(2000);
-  if(error) throw error;
-
-  let maxNo=0;
-  (data||[]).forEach(r=>{
-    const raw=String(r.estimate_number??'').trim();
-    if(/^\d+$/.test(raw)){
-      const n=Number(raw);
-      if(n>=1 && n<=2000000 && n>maxNo) maxNo=n;
-    }
-  });
-
-  let next=maxNo+1;
-  if(next<1) next=1;
-  if(next>2000000) throw new Error('La numeración llegó al límite de 2,000,000.');
-
-  // Evita repetir un número si ya existe.
-  while(next<=2000000){
-    const {data:exists,error:checkErr}=await db.from('projects')
-      .select('id').eq('estimate_number',String(next)).limit(1);
-    if(checkErr) throw checkErr;
-    if(!exists?.length) return String(next);
-    next++;
-  }
-  throw new Error('No hay más números disponibles hasta 2,000,000.');
 }
 
 async function saveCloudQuote(){
@@ -802,17 +758,9 @@ async function saveCloudQuote(){
 
   if(!firstName || !lastName){ alert('Escribe nombre y apellido del cliente.'); return; }
   if(!projectName){ alert('Escribe el nombre del proyecto.'); return; }
-
-  // Solo damos un número nuevo cuando ES una cotización nueva.
-  // Si abriste una existente, conserva su mismo número.
-  if(!cloudProjectId && !estimateNo){
-    try{
-      estimateNo=await getNextInvoiceNumber();
-      document.getElementById('estimateNo').value=estimateNo;
-    }catch(e){
-      alert('Error generando el siguiente número: '+e.message);
-      return;
-    }
+  if(!estimateNo){
+    estimateNo='EST-'+new Date().toISOString().slice(0,10).replaceAll('-','')+'-'+String(Date.now()).slice(-4);
+    document.getElementById('estimateNo').value=estimateNo;
   }
 
   // Find same client first
@@ -833,75 +781,15 @@ async function saveCloudQuote(){
     clientId=newClient.id;
   }
 
-  const quote=currentQuote();
-  quote.estimateNo=estimateNo;
-  quote.saved_by=session.user.email||'';
-  quote.saved_at=new Date().toISOString();
-
-  if(cloudProjectId){
-    // PROYECTO EXISTENTE: actualizar el mismo folder, no crear otro.
-    const {error:projectErr}=await db.from('projects')
-      .update({client_id:clientId,project_name:projectName,estimate_number:estimateNo,project_date:projectDate||null})
-      .eq('id',cloudProjectId);
-    if(projectErr){
-      alert('No pude actualizar el proyecto existente. Supabase necesita permiso UPDATE en la tabla projects. Error: '+projectErr.message);
-      return;
-    }
-
-    // V2.7.3: mantener UNA sola versión de datos por proyecto.
-    // Primero buscamos todos los registros existentes de este project_id.
-    const {data:dataRows,error:dataFindErr}=await db.from('project_data')
-      .select('id,created_at')
-      .eq('project_id',cloudProjectId)
-      .order('created_at',{ascending:false});
-    if(dataFindErr){
-      alert('Proyecto actualizado, pero no pude revisar sus versiones: '+dataFindErr.message);
-      return;
-    }
-
-    if(dataRows?.length){
-      // Actualizar el registro más reciente en vez de insertar una copia nueva.
-      const keepId=dataRows[0].id;
-      const {error:dataUpdateErr}=await db.from('project_data')
-        .update({data:quote})
-        .eq('id',keepId);
-      if(dataUpdateErr){
-        alert('No pude reemplazar los datos del proyecto. Falta permiso UPDATE en project_data. Error: '+dataUpdateErr.message);
-        return;
-      }
-
-      // Si quedaron versiones antiguas de V2.7.2 o anteriores, eliminarlas.
-      const oldIds=dataRows.slice(1).map(r=>r.id);
-      if(oldIds.length){
-        const {error:deleteErr}=await db.from('project_data')
-          .delete()
-          .in('id',oldIds);
-        if(deleteErr){
-          alert('Los datos nuevos sí se guardaron, pero no pude borrar '+oldIds.length+' versión(es) vieja(s). Ejecuta el permiso/limpieza V2.7.3 en Supabase. Error: '+deleteErr.message);
-          markQuoteSaved();
-          return;
-        }
-      }
-    } else {
-      // Proyecto antiguo sin project_data: crear su único registro.
-      const {error:dataInsertErr}=await db.from('project_data')
-        .insert({project_id:cloudProjectId,data:quote});
-      if(dataInsertErr){
-        alert('Proyecto actualizado, pero hubo error creando sus datos: '+dataInsertErr.message);
-        return;
-      }
-    }
-
-    markQuoteSaved();
-    alert('✅ Proyecto actualizado. Quedó una sola versión vigente en el folder del cliente.');
-    return;
-  }
-
-  // COTIZACIÓN NUEVA: crear un folder/proyecto nuevo.
+  // Current security setup supports SELECT + INSERT. Save as a new estimate record.
   const {data:newProject,error:projectErr}=await db.from('projects')
     .insert({client_id:clientId,project_name:projectName,estimate_number:estimateNo,project_date:projectDate||null})
     .select('id').single();
   if(projectErr){ alert('Error guardando proyecto: '+projectErr.message); return; }
+
+  const quote=currentQuote();
+  quote.saved_by=session.user.email||'';
+  quote.saved_at=new Date().toISOString();
 
   const {error:dataErr}=await db.from('project_data')
     .insert({project_id:newProject.id,data:quote});
@@ -909,7 +797,7 @@ async function saveCloudQuote(){
 
   cloudProjectId=newProject.id;
   markQuoteSaved();
-  alert('✅ Cliente y estimate #'+estimateNo+' guardados en la nube. La pantalla se limpiará para la siguiente cotización.');
+  alert('✅ Cliente y estimate guardados en la nube. La pantalla se limpiará para la siguiente cotización.');
   clearQuoteForNext();
 }
 
@@ -1000,10 +888,11 @@ async function loadCloudProject(client,project){
   document.getElementById('estimateNo').value=project.estimate_number||'';
   document.getElementById('date').value=project.project_date||new Date().toISOString().slice(0,10);
 
-  if(q.slabLength!=null) document.getElementById('slabLength').value=q.slabLength;
-  if(q.slabWidth!=null) document.getElementById('slabWidth').value=q.slabWidth;
-  if(q.materialPrice!=null) document.getElementById('materialPrice').value=q.materialPrice;
-  if(q.materialMarkup!=null) document.getElementById('materialMarkup').value=q.materialMarkup;
+  if(Array.isArray(q.slabs)){
+    slabs=q.slabs;
+  } else if(q.slabLength!=null || q.slabWidth!=null){
+    slabs=[{length:q.slabLength||'',width:q.slabWidth||'',qty:(q.slabQty||1),price:q.materialPrice||'',markup:q.materialMarkup||''}];
+  }
   if(q.laborPrice!=null) document.getElementById('laborPrice').value=q.laborPrice;
   if(q.contingency!=null) document.getElementById('contingency').value=q.contingency;
 
@@ -1011,6 +900,7 @@ async function loadCloudProject(client,project){
   if(Array.isArray(q.extras)) extras=q.extras;
   cloudProjectId=project.id;
 
+  renderSlabs();
   renderPieces();
   renderExtras();
   calculate();
@@ -1024,7 +914,7 @@ function newCloudQuote(){
     (document.getElementById('firstName').value||'').trim() ||
     (document.getElementById('lastName').value||'').trim() ||
     (document.getElementById('project').value||'').trim() ||
-    (document.getElementById('slabLength').value||'').trim() ||
+    slabs.some(s => String(s.length||'').trim() || String(s.width||'').trim() || String(s.price||'').trim()) ||
     pieces.length || extras.length;
 
   if(hasData && !currentQuoteSaved){
@@ -1035,12 +925,16 @@ function newCloudQuote(){
 }
 
 
-['firstName','lastName','clientPhone','project','estimateNo','date','slabLength','slabWidth','materialPrice','materialMarkup','laborPrice','contingency']
+['firstName','lastName','clientPhone','project','estimateNo','date','laborPrice','contingency']
 .forEach(id=>{
   const el=document.getElementById(id);
   if(el) el.addEventListener('input', markQuoteUnsaved);
 });
 
+renderSlabs();
+renderPieces();
+renderExtras();
+calculate();
 db.auth.onAuthStateChange(()=>refreshAuthUI());
 setTimeout(refreshAuthUI,0);
 
