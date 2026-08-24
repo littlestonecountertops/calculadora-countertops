@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Little Stone Countertops - Calculadora v3.0 Cloud</title>
+<title>Little Stone Countertops - Calculadora v3.2 Cloud</title>
 <style>
 :root{
   --bg:#f4f5f7; --card:#ffffff; --line:#e4e7ec; --text:#16181d; --muted:#667085;
@@ -165,7 +165,7 @@ input:disabled{background:#f2f4f7;color:#667085}
 .slabs-table input{min-width:84px}
 .slabs-table td,.slabs-table th{white-space:nowrap}
 .slabs-table .del-slab{border:1px solid #fecaca;background:#fff;color:#dc2626;border-radius:7px;padding:6px 8px;cursor:pointer}
-@media(max-width:700px){.slabs-table{min-width:980px}}
+@media(max-width:700px){.slabs-table{min-width:1120px}}
 
 .blank-note{font-size:11px;color:#667085;margin-top:7px}
 </style>
@@ -176,7 +176,7 @@ input:disabled{background:#f2f4f7;color:#667085}
 
   <div class="topbar">
     <div class="brand">LITTLE STONE<small>COUNTERTOPS</small></div>
-    <div class="title">Calculadora v3.0 Cloud</div>
+    <div class="title">Calculadora v3.2 Cloud</div>
     <div class="top-actions">
       <span id="saveStateBadge" class="save-state unsaved">Nueva cotización</span>
       <button class="newquote-btn" onclick="newCloudQuote()" title="Nueva cotización">➕ Nueva cotización</button>
@@ -207,11 +207,11 @@ input:disabled{background:#f2f4f7;color:#667085}
     <div class="table-wrap">
       <table class="slabs-table">
         <thead>
-          <tr><th>#</th><th>Largo (in)</th><th>Ancho (in)</th><th>Cantidad</th><th>Costo $/sqft</th><th>Recargo %</th><th>SQFT c/u</th><th>SQFT total</th><th>Costo final</th><th>Acciones</th></tr>
+          <tr><th>#</th><th>Material</th><th>Largo (in)</th><th>Ancho (in)</th><th>Cantidad</th><th>Costo $/sqft</th><th>Recargo %</th><th>SQFT c/u</th><th>SQFT total</th><th>Costo final</th><th>Acciones</th></tr>
         </thead>
         <tbody id="slabsBody"></tbody>
         <tfoot>
-          <tr><td colspan="7" class="num">Total material:</td><td id="slabsTotalSqft">0.00 sqft</td><td class="green" id="slabsGrandTotal">$0.00</td><td></td></tr>
+          <tr><td colspan="8" class="num">Total material:</td><td id="slabsTotalSqft">0.00 sqft</td><td class="green" id="slabsGrandTotal">$0.00</td><td></td></tr>
         </tfoot>
       </table>
     </div>
@@ -331,12 +331,24 @@ input:disabled{background:#f2f4f7;color:#667085}
 
 <script>
 const areaOptions = [
-  "Kitchen","Master Bathroom","Main Floor Bathroom","Basement Bathroom",
-  "Laundry Room","Bar","Pantry","Other"
+  "Kitchen",
+  "Master Bath",
+  "Primary Bath",
+  "Main Bath",
+  "Powder Bath",
+  "Downstairs Bath",
+  "Basement Bath",
+  "Guest Bath",
+  "Laundry",
+  "Bar",
+  "Pantry",
+  "Office",
+  "Fireplace",
+  "Custom / Otro"
 ];
 
 let slabs = [
-  {length:'', width:'', qty:'', price:'', markup:''}
+  {name:'', length:'', width:'', qty:'', price:'', markup:''}
 ];
 
 function renderSlabs(){
@@ -347,6 +359,7 @@ function renderSlabs(){
     const tr=document.createElement('tr');
     tr.innerHTML=`
       <td>${i+1}</td>
+      <td><input type="text" value="${s.name ?? ''}" placeholder="Nombre material" oninput="slabs[${i}].name=this.value;markQuoteUnsaved()"></td>
       <td><input type="number" step="0.01" value="${s.length ?? ''}" placeholder="Largo" oninput="slabs[${i}].length=this.value;calculate();markQuoteUnsaved()"></td>
       <td><input type="number" step="0.01" value="${s.width ?? ''}" placeholder="Ancho" oninput="slabs[${i}].width=this.value;calculate();markQuoteUnsaved()"></td>
       <td><input type="number" min="1" step="1" value="${s.qty ?? ''}" placeholder="Cant." oninput="slabs[${i}].qty=this.value;calculate();markQuoteUnsaved()"></td>
@@ -361,21 +374,21 @@ function renderSlabs(){
   calculate();
 }
 function addSlab(){
-  slabs.push({length:'',width:'',qty:'',price:'',markup:''});
+  slabs.push({name:'',length:'',width:'',qty:'',price:'',markup:''});
   renderSlabs();
   markQuoteUnsaved();
 }
 function removeSlab(i){
   slabs.splice(i,1);
-  if(!slabs.length) slabs.push({length:'',width:'',qty:'',price:'',markup:''});
+  if(!slabs.length) slabs.push({name:'',length:'',width:'',qty:'',price:'',markup:''});
   renderSlabs();
   markQuoteUnsaved();
 }
 
 let pieces = [
-  {area:"Kitchen", type:"kitchen", length:'', width:26, backsplash:true},
-  {area:"Master Bathroom", type:"bathroom", length:'', width:23, backsplash:true},
-  {area:"Main Floor Bathroom", type:"bathroom", length:'', width:23, backsplash:true}
+  {area:"Kitchen", customArea:"", type:"kitchen", length:'', width:26, backsplash:true},
+  {area:"Master Bath", customArea:"", type:"bathroom", length:'', width:23, backsplash:true},
+  {area:"Main Bath", customArea:"", type:"bathroom", length:'', width:23, backsplash:true}
 ];
 
 const EXTRA_TEMPLATE = [
@@ -393,6 +406,10 @@ function blankExtras(){
   return EXTRA_TEMPLATE.map(x=>({...x,qty:'',price:''}));
 }
 let extras = blankExtras();
+
+function pieceDisplayName(p){
+  return p.area==="Custom / Otro" ? ((p.customArea||"").trim() || "Custom") : (p.area||"");
+}
 
 function money(v){
   return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(Number(v)||0);
@@ -412,6 +429,11 @@ function renderPieces(){
   body.innerHTML = "";
   pieces.forEach((p,i)=>{
     if(!p.type) p.type = "custom";
+    if(typeof p.customArea === "undefined") p.customArea = "";
+    if(p.area && !areaOptions.includes(p.area)){
+      p.customArea = p.area;
+      p.area = "Custom / Otro";
+    }
     if(typeof p.backsplash === "undefined") p.backsplash = false;
     if(p.type==="kitchen") p.width=26;
     if(p.type==="bathroom") p.width=23;
@@ -425,7 +447,10 @@ function renderPieces(){
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${i+1}</td>
-      <td><select onchange="pieces[${i}].area=this.value;saveTemp()">${opts}</select></td>
+      <td>
+        <select onchange="pieces[${i}].area=this.value;if(this.value!=='Custom / Otro')pieces[${i}].customArea='';renderPieces();calculate();markQuoteUnsaved()">${opts}</select>
+        ${p.area==="Custom / Otro" ? `<input type="text" style="margin-top:6px" value="${p.customArea ?? ''}" placeholder="Escribe el nombre" oninput="pieces[${i}].customArea=this.value;markQuoteUnsaved()">` : ''}
+      </td>
       <td><select onchange="changePieceType(${i},this.value)">${typeOpts}</select></td>
       <td><input type="number" step="0.01" value="${p.length ?? ''}" oninput="pieces[${i}].length=this.value;calculate()"></td>
       <td><input type="number" step="0.01" value="${p.width}" ${p.type!=="custom"?'disabled':''} oninput="pieces[${i}].width=this.value;calculate()"></td>
@@ -723,11 +748,11 @@ function clearQuoteForNext(){
   document.getElementById('laborPrice').value='';
   document.getElementById('contingency').value='';
 
-  slabs=[{length:'',width:'',qty:'',price:'',markup:''}];
+  slabs=[{name:'',length:'',width:'',qty:'',price:'',markup:''}];
   pieces=[
-    {area:"Kitchen", type:"kitchen", length:'', width:26, backsplash:true},
-    {area:"Master Bathroom", type:"bathroom", length:'', width:23, backsplash:true},
-    {area:"Main Floor Bathroom", type:"bathroom", length:'', width:23, backsplash:true}
+    {area:"Kitchen", customArea:"", type:"kitchen", length:'', width:26, backsplash:true},
+    {area:"Master Bath", customArea:"", type:"bathroom", length:'', width:23, backsplash:true},
+    {area:"Main Bath", customArea:"", type:"bathroom", length:'', width:23, backsplash:true}
   ];
   extras=blankExtras();
   cloudProjectId=null;
@@ -891,7 +916,7 @@ async function loadCloudProject(client,project){
   if(Array.isArray(q.slabs)){
     slabs=q.slabs;
   } else if(q.slabLength!=null || q.slabWidth!=null){
-    slabs=[{length:q.slabLength||'',width:q.slabWidth||'',qty:(q.slabQty||1),price:q.materialPrice||'',markup:q.materialMarkup||''}];
+    slabs=[{name:q.materialName||'',length:q.slabLength||'',width:q.slabWidth||'',qty:(q.slabQty||1),price:q.materialPrice||'',markup:q.materialMarkup||''}];
   }
   if(q.laborPrice!=null) document.getElementById('laborPrice').value=q.laborPrice;
   if(q.contingency!=null) document.getElementById('contingency').value=q.contingency;
@@ -914,7 +939,7 @@ function newCloudQuote(){
     (document.getElementById('firstName').value||'').trim() ||
     (document.getElementById('lastName').value||'').trim() ||
     (document.getElementById('project').value||'').trim() ||
-    slabs.some(s => String(s.length||'').trim() || String(s.width||'').trim() || String(s.price||'').trim()) ||
+    slabs.some(s => String(s.name||'').trim() || String(s.length||'').trim() || String(s.width||'').trim() || String(s.price||'').trim()) ||
     pieces.length || extras.length;
 
   if(hasData && !currentQuoteSaved){
@@ -929,6 +954,55 @@ function newCloudQuote(){
 .forEach(id=>{
   const el=document.getElementById(id);
   if(el) el.addEventListener('input', markQuoteUnsaved);
+});
+
+
+function getNextEditableField(current){
+  const selector = [
+    'input:not([disabled]):not([type="hidden"]):not([type="checkbox"])',
+    'select:not([disabled])',
+    'textarea:not([disabled])'
+  ].join(',');
+
+  const fields = Array.from(document.querySelectorAll(selector))
+    .filter(el => {
+      const style = window.getComputedStyle(el);
+      return style.display !== 'none' &&
+             style.visibility !== 'hidden' &&
+             el.offsetParent !== null;
+    });
+
+  const index = fields.indexOf(current);
+  if(index === -1) return null;
+
+  for(let i=index+1; i<fields.length; i++){
+    const el = fields[i];
+    if(!el.readOnly && !el.disabled) return el;
+  }
+  return fields[0] || null;
+}
+
+document.addEventListener('keydown', function(e){
+  if(e.key !== 'Enter') return;
+
+  const target = e.target;
+  if(!target.matches('input, select, textarea')) return;
+
+  // Keep Enter available for multiline notes.
+  if(target.tagName === 'TEXTAREA') return;
+
+  e.preventDefault();
+
+  // Make sure the latest typed number/text is committed before moving.
+  target.dispatchEvent(new Event('change', {bubbles:true}));
+
+  const next = getNextEditableField(target);
+  if(next){
+    next.focus();
+    if(next.tagName === 'INPUT' && typeof next.select === 'function'){
+      next.select();
+    }
+  }
 });
 
 renderSlabs();
