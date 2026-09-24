@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Little Stone Countertops - Calculadora v3.6 Cloud</title>
+<title>Little Stone Countertops - Calculadora v3.7 Cloud</title>
 <style>
 :root{
   --bg:#f4f5f7; --card:#ffffff; --line:#e4e7ec; --text:#16181d; --muted:#667085;
@@ -147,6 +147,7 @@ input:disabled{background:#f2f4f7;color:#667085}
   white-space:nowrap;
 }
 .newquote-btn:hover{background:#ede9fe}
+.mobile-label{display:none}
 @media(max-width:700px){
   .newquote-btn{padding:7px 9px;font-size:11px}
 }
@@ -176,6 +177,63 @@ input:disabled{background:#f2f4f7;color:#667085}
 .extras-table th{background:#f8fafc;color:#475467;font-size:12px}
 .extras-table input,.extras-table select{padding:7px 8px;font-size:13px}
 @media(max-width:700px){.extras-table{min-width:820px}}
+
+.client-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.client-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.client-action{border:1px solid #d0d5dd;background:#fff;border-radius:7px;padding:6px 8px;font-size:11px;font-weight:700;cursor:pointer}
+.client-action.archive{color:#92400e;border-color:#fde68a;background:#fffbeb}
+.client-action.restore{color:#166534;border-color:#bbf7d0;background:#f0fdf4}
+.client-action.delete{color:#b91c1c;border-color:#fecaca;background:#fff}
+.archive-toggle{display:flex;align-items:center;gap:7px;font-size:12px;color:#475467;margin:2px 0 12px}
+.archive-toggle input{width:17px;height:17px;margin:0}
+.toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,20px);z-index:2000;max-width:min(92vw,520px);padding:11px 14px;border-radius:10px;background:#111827;color:#fff;font-size:13px;font-weight:700;box-shadow:0 12px 30px rgba(0,0,0,.22);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast.success{background:#166534}.toast.error{background:#991b1b}
+
+/* Diseño especial únicamente para teléfonos. Computadora y iPad conservan su vista. */
+@media(max-width:600px){
+  body{padding-bottom:72px}
+  .app{padding:4px}
+  .topbar{position:static;display:block;border-radius:10px;padding:10px}
+  .brand{font-size:14px}.brand small{font-size:9px}
+  .title{text-align:left;font-size:14px;margin-top:7px;color:#ddd6fe}
+  .top-actions{position:fixed;left:0;right:0;bottom:0;z-index:1000;background:#111318;padding:7px max(7px,env(safe-area-inset-right)) calc(7px + env(safe-area-inset-bottom)) max(7px,env(safe-area-inset-left));display:grid;grid-template-columns:1.35fr repeat(4,1fr);gap:6px;box-shadow:0 -4px 18px rgba(0,0,0,.2)}
+  .save-state{display:none}
+  .newquote-btn,.iconbtn{min-height:48px;padding:7px 4px;font-size:18px;display:flex;align-items:center;justify-content:center}
+  .newquote-btn{font-size:12px;line-height:1.1;white-space:normal}
+  .newquote-btn .desktop-label{display:none}
+  .newquote-btn .mobile-label{display:inline}
+  .card{padding:9px 8px;margin-top:6px}
+  .cloud-meta,.grid4,.grid2{grid-template-columns:1fr}
+  .pieces-head{align-items:center;gap:8px}
+  .pieces-head .btn{min-height:42px;flex:0 0 auto}
+  input,select{min-height:44px;font-size:16px}
+  td input,td select,.extras-table input,.extras-table select{font-size:16px;min-height:42px}
+  .summary-row{padding:11px 9px}
+  .action-grid{grid-template-columns:1fr}
+  .action-grid .btn{min-height:46px}
+  .grand{padding:12px}.grand .amount{font-size:22px}
+  .cloud-search{grid-template-columns:1fr}.cloud-search .btn{min-height:44px}
+  .modal-backdrop{padding:6px;align-items:flex-end}
+  .modal{max-height:92vh;border-radius:14px 14px 0 0}
+  .modal-head,.modal-body{padding:12px}
+  .client-head{display:block}.client-actions{justify-content:flex-start;margin-top:9px}
+  .client-action{min-height:38px}
+  .toast{bottom:82px}
+
+  .table-wrap{overflow:visible}
+  .slabs-table,.pieces-table,.extras-table{min-width:0;width:100%}
+  .slabs-table thead,.slabs-table tfoot,.pieces-table thead,.pieces-table tfoot,.extras-table thead{display:none}
+  .slabs-table tbody,.pieces-table tbody,.extras-table tbody{display:grid;gap:9px}
+  .slabs-table tbody tr,.pieces-table tbody tr,.extras-table tbody tr{display:block;border:1px solid #e4e7ec;border-radius:10px;padding:7px;background:#fff}
+  .slabs-table tbody td,.pieces-table tbody td,.extras-table tbody td{display:grid;grid-template-columns:112px minmax(0,1fr);gap:8px;align-items:center;border-bottom:1px solid #f0f1f3;padding:7px 5px;white-space:normal;text-align:left}
+  .slabs-table tbody td:last-child,.pieces-table tbody td:last-child,.extras-table tbody td:last-child{border-bottom:0}
+  .slabs-table tbody td::before,.pieces-table tbody td::before,.extras-table tbody td::before{font-size:11px;font-weight:800;color:#667085}
+  .slabs-table td:nth-child(1)::before,.pieces-table td:nth-child(1)::before{content:"#"}
+  .slabs-table td:nth-child(2)::before{content:"Material"}.slabs-table td:nth-child(3)::before{content:"Largo (in)"}.slabs-table td:nth-child(4)::before{content:"Ancho (in)"}.slabs-table td:nth-child(5)::before{content:"Cantidad"}.slabs-table td:nth-child(6)::before{content:"Costo $/sqft"}.slabs-table td:nth-child(7)::before{content:"Recargo %"}.slabs-table td:nth-child(8)::before{content:"SQFT c/u"}.slabs-table td:nth-child(9)::before{content:"SQFT total"}.slabs-table td:nth-child(10)::before{content:"Costo final"}.slabs-table td:nth-child(11)::before{content:"Acciones"}
+  .pieces-table td:nth-child(2)::before{content:"Área"}.pieces-table td:nth-child(3)::before{content:"Tipo"}.pieces-table td:nth-child(4)::before{content:"Largo (in)"}.pieces-table td:nth-child(5)::before{content:"Ancho (in)"}.pieces-table td:nth-child(6)::before{content:"B/S 4 in"}.pieces-table td:nth-child(7)::before{content:"Top sqft"}.pieces-table td:nth-child(8)::before{content:"B/S sqft"}.pieces-table td:nth-child(9)::before{content:"Total sqft"}.pieces-table td:nth-child(10)::before{content:"Acciones"}
+  .extras-table td:nth-child(1)::before{content:"Servicio"}.extras-table td:nth-child(2)::before{content:"Descripción"}.extras-table td:nth-child(3)::before{content:"Cantidad"}.extras-table td:nth-child(4)::before{content:"Precio unit."}.extras-table td:nth-child(5)::before{content:"Total"}.extras-table td:nth-child(6)::before{content:"Acciones"}
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -184,10 +242,10 @@ input:disabled{background:#f2f4f7;color:#667085}
 
   <div class="topbar">
     <div class="brand">LITTLE STONE<small>COUNTERTOPS</small></div>
-    <div class="title">Calculadora v3.6 Cloud</div>
+    <div class="title">Calculadora v3.7 Cloud</div>
     <div class="top-actions">
-      <span id="saveStateBadge" class="save-state unsaved">Nueva cotización</span>
-      <button class="newquote-btn" onclick="newCloudQuote()" title="Nueva cotización">➕ Nueva cotización</button>
+      <span id="saveStateBadge" class="save-state unsaved" title="Estado de la cotización">● Sin guardar</span>
+      <button class="newquote-btn" onclick="newCloudQuote()" title="Nueva cotización">➕ <span class="desktop-label">Nueva cotización</span><span class="mobile-label">Nueva</span></button>
       <button class="iconbtn" onclick="saveCloudQuote()" title="Guardar en la nube">💾</button>
       <button class="iconbtn" onclick="openClientSearch()" title="Buscar cliente">🔍</button>
       <button class="iconbtn" onclick="openLogin()" title="Cuenta" id="accountBtn">👤</button>
@@ -237,7 +295,7 @@ input:disabled{background:#f2f4f7;color:#667085}
       <button class="btn purple" onclick="addPiece()">＋ Agregar pieza</button>
     </div>
     <div class="table-wrap">
-      <table>
+      <table class="pieces-table">
         <thead>
           <tr><th>#</th><th>Nombre / área</th><th>Tipo</th><th>Largo (in)</th><th>Ancho (in)</th><th>B/S 4"</th><th>Top sqft</th><th>B/S sqft</th><th>Total sqft</th><th>Acciones</th></tr>
         </thead>
@@ -347,12 +405,15 @@ input:disabled{background:#f2f4f7;color:#667085}
         <input id="clientSearchInput" placeholder="Nombre, apellido o teléfono" oninput="searchClientsDebounced()">
         <button class="btn purple" onclick="searchClients()">Buscar</button>
       </div>
+      <label class="archive-toggle"><input id="showArchivedClients" type="checkbox" onchange="searchClients()"> Mostrar clientes archivados</label>
       <div id="clientSearchResults">
         <div class="result-sub">Empieza a escribir para buscar clientes.</div>
       </div>
     </div>
   </div>
 </div>
+
+<div id="appToast" class="toast" role="status" aria-live="polite"></div>
 
 
 <script>
@@ -791,6 +852,16 @@ let clientSearchRequest = 0;
 function openModal(id){ document.getElementById(id).classList.add('show'); }
 function closeModal(id){ document.getElementById(id).classList.remove('show'); }
 
+let toastTimer=null;
+function showToast(message,type='success'){
+  const toast=document.getElementById('appToast');
+  if(!toast) return;
+  clearTimeout(toastTimer);
+  toast.textContent=message;
+  toast.className='toast '+type+' show';
+  toastTimer=setTimeout(()=>{ toast.className='toast'; },2600);
+}
+
 async function refreshAuthUI(){
   const { data: { session } } = await db.auth.getSession();
   const btn = document.getElementById('accountBtn');
@@ -893,7 +964,7 @@ function markQuoteUnsaved(){
   scheduleTempSave();
   const b=document.getElementById('saveStateBadge');
   if(b){
-    b.textContent='Sin guardar';
+    b.textContent='● Sin guardar';
     b.className='save-state unsaved';
   }
 }
@@ -901,7 +972,7 @@ function markQuoteSaved(){
   currentQuoteSaved = true;
   const b=document.getElementById('saveStateBadge');
   if(b){
-    b.textContent='✅ Guardado';
+    b.textContent='✓ Guardado';
     b.className='save-state saved';
   }
 }
@@ -931,7 +1002,7 @@ function clearQuoteForNext(){
   calculate();
   const b=document.getElementById('saveStateBadge');
   if(b){
-    b.textContent='Nueva cotización';
+    b.textContent='● Sin guardar';
     b.className='save-state unsaved';
   }
   currentQuoteSaved=false;
@@ -957,7 +1028,7 @@ async function saveCloudQuote(){
   }
 
   // Find same client first
-  let q=db.from('clients').select('id,first_name,last_name,phone')
+  let q=db.from('clients').select('id,first_name,last_name,phone,archived_at')
     .ilike('first_name',firstName).ilike('last_name',lastName);
   if(phone) q=q.eq('phone',phone);
   const {data:found,error:findErr}=await q.limit(1);
@@ -966,6 +1037,10 @@ async function saveCloudQuote(){
   let clientId;
   if(found && found.length){
     clientId=found[0].id;
+    if(found[0].archived_at){
+      const {error:restoreErr}=await db.from('clients').update({archived_at:null}).eq('id',clientId);
+      if(restoreErr){ alert('Error reactivando cliente: '+restoreErr.message); return; }
+    }
   } else {
     const {data:newClient,error:clientErr}=await db.from('clients')
       .insert({first_name:firstName,last_name:lastName,phone:phone||null})
@@ -998,6 +1073,7 @@ async function openClientSearch(){
   const session=await requireSession();
   if(!session) return;
   document.getElementById('clientSearchInput').value='';
+  document.getElementById('showArchivedClients').checked=false;
   document.getElementById('clientSearchResults').innerHTML='<div class="result-sub">Empieza a escribir para buscar clientes.</div>';
   openModal('clientSearchModal');
   setTimeout(()=>document.getElementById('clientSearchInput').focus(),100);
@@ -1012,15 +1088,16 @@ async function searchClients(){
   const box=document.getElementById('clientSearchResults');
   if(term.length<1){ box.innerHTML='<div class="result-sub">Empieza a escribir para buscar clientes.</div>'; return; }
   const requestId=++clientSearchRequest;
+  const showArchived=document.getElementById('showArchivedClients').checked;
 
   // Search first name, last name, and phone
   const safe=term.replaceAll(',',' ');
   const filter=`first_name.ilike.%${safe}%,last_name.ilike.%${safe}%,phone.ilike.%${safe}%`;
-  const {data,error}=await db.from('clients')
-    .select('id,first_name,last_name,phone')
-    .or(filter)
-    .order('last_name')
-    .limit(20);
+  let query=db.from('clients')
+    .select('id,first_name,last_name,phone,archived_at')
+    .or(filter);
+  query=showArchived ? query.not('archived_at','is',null) : query.is('archived_at',null);
+  const {data,error}=await query.order('last_name').limit(20);
 
   if(requestId!==clientSearchRequest) return;
   if(error){ box.innerHTML='<div class="result-sub">Error: '+error.message+'</div>'; return; }
@@ -1030,12 +1107,52 @@ async function searchClients(){
   for(const c of data){
     const item=document.createElement('div');
     item.className='result-item';
-    item.innerHTML=`<div class="result-name">👤 ${c.first_name||''} ${c.last_name||''}</div>
-      <div class="result-sub">${c.phone||'Sin teléfono'}</div>
+    item.innerHTML=`<div class="client-head"><div><div class="result-name">👤 ${c.first_name||''} ${c.last_name||''}</div>
+      <div class="result-sub">${c.phone||'Sin teléfono'}${c.archived_at?' · Archivado':''}</div></div>
+      <div class="client-actions"></div></div>
       <div class="project-list" id="client-projects-${c.id}" style="display:none"></div>`;
     item.onclick=()=>toggleClientProjects(c,item);
+    const actions=item.querySelector('.client-actions');
+    const archiveBtn=document.createElement('button');
+    archiveBtn.className='client-action '+(c.archived_at?'restore':'archive');
+    archiveBtn.textContent=c.archived_at?'↩ Restaurar':'📦 Archivar';
+    archiveBtn.onclick=(ev)=>{ ev.stopPropagation(); c.archived_at ? restoreClient(c,item) : archiveClient(c,item); };
+    const deleteBtn=document.createElement('button');
+    deleteBtn.className='client-action delete';
+    deleteBtn.textContent='🗑 Eliminar';
+    deleteBtn.onclick=(ev)=>{ ev.stopPropagation(); deleteClientForever(c,item); };
+    actions.appendChild(archiveBtn);
+    actions.appendChild(deleteBtn);
     box.appendChild(item);
   }
+}
+
+async function archiveClient(client,item){
+  const name=`${client.first_name||''} ${client.last_name||''}`.trim()||'este cliente';
+  if(!confirm(`¿Archivar a ${name}? Sus cotizaciones se conservarán.`)) return;
+  const {error}=await db.from('clients').update({archived_at:new Date().toISOString()}).eq('id',client.id);
+  if(error){ showToast('No se pudo archivar: '+error.message,'error'); return; }
+  item.remove();
+  showToast('Cliente archivado. Sus cotizaciones siguen guardadas.');
+}
+
+async function restoreClient(client,item){
+  const {error}=await db.from('clients').update({archived_at:null}).eq('id',client.id);
+  if(error){ showToast('No se pudo restaurar: '+error.message,'error'); return; }
+  item.remove();
+  showToast('Cliente restaurado.');
+}
+
+async function deleteClientForever(client,item){
+  const name=`${client.first_name||''} ${client.last_name||''}`.trim()||'este cliente';
+  const accepted=confirm(`ATENCIÓN: eliminarás definitivamente a ${name} y todas sus cotizaciones. Esta acción no se puede deshacer. ¿Continuar?`);
+  if(!accepted) return;
+  const verification=prompt('Para confirmar, escribe ELIMINAR:');
+  if(verification!=='ELIMINAR'){ showToast('Eliminación cancelada.','error'); return; }
+  const {error}=await db.rpc('delete_client_cascade',{p_client_id:String(client.id)});
+  if(error){ showToast('No se pudo eliminar: '+error.message,'error'); return; }
+  item.remove();
+  showToast('Cliente y sus cotizaciones fueron eliminados.');
 }
 
 async function toggleClientProjects(client,item){
@@ -1109,7 +1226,7 @@ async function loadCloudProject(client,project){
   renderExtras();
   calculate();
   closeModal('clientSearchModal');
-  alert('✅ Estimate abierto desde la nube.');
+  showToast('✓ Estimate abierto desde la nube.');
 }
 
 
