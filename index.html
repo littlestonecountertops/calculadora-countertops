@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Little Stone Countertops - Calculadora v3.5 Cloud</title>
+<title>Little Stone Countertops - Calculadora v3.6 Cloud</title>
 <style>
 :root{
   --bg:#f4f5f7; --card:#ffffff; --line:#e4e7ec; --text:#16181d; --muted:#667085;
@@ -184,7 +184,7 @@ input:disabled{background:#f2f4f7;color:#667085}
 
   <div class="topbar">
     <div class="brand">LITTLE STONE<small>COUNTERTOPS</small></div>
-    <div class="title">Calculadora v3.5 Cloud</div>
+    <div class="title">Calculadora v3.6 Cloud</div>
     <div class="top-actions">
       <span id="saveStateBadge" class="save-state unsaved">Nueva cotización</span>
       <button class="newquote-btn" onclick="newCloudQuote()" title="Nueva cotización">➕ Nueva cotización</button>
@@ -308,11 +308,29 @@ input:disabled{background:#f2f4f7;color:#667085}
         <div><label>Email</label><input id="loginEmail" type="email" placeholder="tu@email.com"></div>
         <div><label>Contraseña</label><input id="loginPassword" type="password" placeholder="Contraseña"></div>
         <button class="btn purple" onclick="signInCloud()">Entrar</button>
+        <button class="btn light" onclick="sendRecoveryEmail()">¿Olvidaste tu contraseña?</button>
         <div class="login-status" id="loginStatus"></div>
       </div>
       <div id="loggedInPanel" style="display:none">
         <p style="margin-top:0">Sesión iniciada como <strong id="loggedInEmail"></strong></p>
         <button class="btn red" onclick="signOutCloud()">Cerrar sesión</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="passwordResetModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>🔑 Crear contraseña nueva</h3>
+      <button class="closebtn" onclick="closeModal('passwordResetModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="login-grid">
+        <div><label>Contraseña nueva</label><input id="newPassword" type="password" minlength="6" autocomplete="new-password" placeholder="Mínimo 6 caracteres"></div>
+        <div><label>Confirmar contraseña</label><input id="confirmNewPassword" type="password" minlength="6" autocomplete="new-password" placeholder="Repite la contraseña"></div>
+        <button class="btn purple" onclick="updateRecoveredPassword()">Guardar contraseña nueva</button>
+        <div class="login-status" id="passwordResetStatus"></div>
       </div>
     </div>
   </div>
@@ -428,10 +446,14 @@ function pieceDisplayName(p){
   return p.area==="Custom / Otro" ? ((p.customArea||"").trim() || "Custom") : (p.area||"");
 }
 
-function money(v){
-  return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(Number(v)||0);
-}
+const moneyFormatter = new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'});
+function money(v){ return moneyFormatter.format(Number(v)||0); }
 function sqft(l,w){ return ((Number(l)||0)*(Number(w)||0))/144; }
+
+function setText(id,value){
+  const el=document.getElementById(id);
+  if(el && el.textContent!==String(value)) el.textContent=String(value);
+}
 
 function selectMaterial(btn){
   document.querySelectorAll('.matbtn').forEach(b=>b.classList.remove('active'));
@@ -584,7 +606,18 @@ function removeExtra(i){
   markQuoteUnsaved();
 }
 
+let calculateFrame=null;
+let tempSaveTimer=null;
+
 function calculate(){
+  if(calculateFrame!==null) return;
+  calculateFrame=requestAnimationFrame(()=>{
+    calculateFrame=null;
+    calculateNow();
+  });
+}
+
+function calculateNow(){
   const lp = Number(document.getElementById('laborPrice').value)||0;
   const contingency = Number(document.getElementById('contingency').value)||0;
 
@@ -597,9 +630,10 @@ function calculate(){
     const base=totalSq*price, recargo=base*(markup/100), total=base+recargo;
     slabCount+=qty; slabTotalSq+=totalSq; slabBase+=base; slabMarkupCost+=recargo; materialTotal+=total;
     const a=document.getElementById(`slab-each-${i}`), b=document.getElementById(`slab-total-${i}`), c=document.getElementById(`slab-cost-${i}`);
-    if(a) a.textContent=eachSq.toFixed(2);
-    if(b) b.textContent=totalSq.toFixed(2);
-    if(c) c.textContent=money(total);
+    const eachText=eachSq.toFixed(2), totalText=totalSq.toFixed(2), costText=money(total);
+    if(a && a.textContent!==eachText) a.textContent=eachText;
+    if(b && b.textContent!==totalText) b.textContent=totalText;
+    if(c && c.textContent!==costText) c.textContent=costText;
   });
 
   let totalSq = 0;
@@ -615,9 +649,10 @@ function calculate(){
     const topCell = document.getElementById(`top-${i}`);
     const bsCell = document.getElementById(`bs-${i}`);
     const sqCell = document.getElementById(`sqft-${i}`);
-    if(topCell) topCell.textContent = topSq.toFixed(2);
-    if(bsCell) bsCell.textContent = bsSq.toFixed(2);
-    if(sqCell) sqCell.textContent = s.toFixed(2);
+    const topText=topSq.toFixed(2), bsText=bsSq.toFixed(2), sqText=s.toFixed(2);
+    if(topCell && topCell.textContent!==topText) topCell.textContent=topText;
+    if(bsCell && bsCell.textContent!==bsText) bsCell.textContent=bsText;
+    if(sqCell && sqCell.textContent!==sqText) sqCell.textContent=sqText;
   });
 
   const laborTotal = totalSq*lp;
@@ -630,31 +665,31 @@ function calculate(){
     const t=(Number(e.qty)||0)*(Number(e.price)||0);
     extrasTotal += t;
     const cell=document.getElementById(`extra-${i}`);
-    if(cell) cell.textContent=money(t);
+    const totalText=money(t);
+    if(cell && cell.textContent!==totalText) cell.textContent=totalText;
   });
 
   const grand = subtotalCont + extrasTotal;
 
-  document.getElementById('slabsCountSummary').textContent = slabCount;
-  document.getElementById('slabsTotalSqft').textContent = slabTotalSq.toFixed(2)+" sqft";
-  document.getElementById('slabsGrandTotal').textContent = money(materialTotal);
-  document.getElementById('slabTotalSqft').textContent = slabTotalSq.toFixed(2)+" sqft";
-  document.getElementById('slabMarkupCost').textContent = money(slabMarkupCost);
-  document.getElementById('slabFinal').textContent = money(materialTotal);
-
-  document.getElementById('topSqftTotal').textContent = totalTopSq.toFixed(2);
-  document.getElementById('bsSqftTotal').textContent = totalBsSq.toFixed(2);
-  document.getElementById('totalSqft').textContent = totalSq.toFixed(2)+" sqft";
-  document.getElementById('matSlabCount').textContent = slabCount;
-  document.getElementById('matSqft').textContent = slabTotalSq.toFixed(2)+" sqft";
-  document.getElementById('matMarkupSummary').textContent = money(slabMarkupCost);
-  document.getElementById('matTotal').textContent = money(materialTotal);
-  document.getElementById('laborTotal').textContent = money(laborTotal);
-  document.getElementById('subtotal').textContent = money(subtotal);
-  document.getElementById('subtotalCont').textContent = money(subtotalCont);
-  document.getElementById('extrasTotal').textContent = money(extrasTotal);
-  document.getElementById('grandTotal').textContent = money(grand);
-  saveTemp();
+  setText('slabsCountSummary',slabCount);
+  setText('slabsTotalSqft',slabTotalSq.toFixed(2)+" sqft");
+  setText('slabsGrandTotal',money(materialTotal));
+  setText('slabTotalSqft',slabTotalSq.toFixed(2)+" sqft");
+  setText('slabMarkupCost',money(slabMarkupCost));
+  setText('slabFinal',money(materialTotal));
+  setText('topSqftTotal',totalTopSq.toFixed(2));
+  setText('bsSqftTotal',totalBsSq.toFixed(2));
+  setText('totalSqft',totalSq.toFixed(2)+" sqft");
+  setText('matSlabCount',slabCount);
+  setText('matSqft',slabTotalSq.toFixed(2)+" sqft");
+  setText('matMarkupSummary',money(slabMarkupCost));
+  setText('matTotal',money(materialTotal));
+  setText('laborTotal',money(laborTotal));
+  setText('subtotal',money(subtotal));
+  setText('subtotalCont',money(subtotalCont));
+  setText('extrasTotal',money(extrasTotal));
+  setText('grandTotal',money(grand));
+  scheduleTempSave();
 }
 
 function currentQuote(){
@@ -671,7 +706,17 @@ function currentQuote(){
     pieces, extras
   };
 }
-function saveTemp(){ localStorage.setItem('littleStoneTemp',JSON.stringify(currentQuote())); }
+function scheduleTempSave(){
+  clearTimeout(tempSaveTimer);
+  tempSaveTimer=setTimeout(saveTemp,500);
+}
+function saveTemp(){
+  try{
+    localStorage.setItem('littleStoneTemp',JSON.stringify(currentQuote()));
+  }catch(error){
+    console.warn('No se pudo guardar el borrador local.',error);
+  }
+}
 function saveQuoteLegacy(){
   const q=currentQuote();
   const key='littleStoneQuotes';
@@ -741,6 +786,7 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
 let cloudProjectId = null;
 let searchTimer = null;
+let clientSearchRequest = 0;
 
 function openModal(id){ document.getElementById(id).classList.add('show'); }
 function closeModal(id){ document.getElementById(id).classList.remove('show'); }
@@ -774,6 +820,52 @@ async function signInCloud(){
   await refreshAuthUI();
   setTimeout(()=>closeModal('loginModal'),500);
 }
+
+async function sendRecoveryEmail(){
+  const email=document.getElementById('loginEmail').value.trim();
+  const status=document.getElementById('loginStatus');
+  if(!email){
+    status.textContent='Escribe primero tu correo electrónico.';
+    document.getElementById('loginEmail').focus();
+    return;
+  }
+  status.textContent='Enviando enlace de recuperación...';
+  const redirectTo=window.location.origin+window.location.pathname;
+  const {error}=await db.auth.resetPasswordForEmail(email,{redirectTo});
+  if(error){
+    status.textContent='Error: '+error.message;
+    return;
+  }
+  status.textContent='✅ Revisa tu correo y abre el enlace para crear una contraseña nueva.';
+}
+
+async function updateRecoveredPassword(){
+  const password=document.getElementById('newPassword').value;
+  const confirmation=document.getElementById('confirmNewPassword').value;
+  const status=document.getElementById('passwordResetStatus');
+  if(password.length<6){
+    status.textContent='La contraseña necesita por lo menos 6 caracteres.';
+    return;
+  }
+  if(password!==confirmation){
+    status.textContent='Las contraseñas no coinciden.';
+    return;
+  }
+  status.textContent='Guardando contraseña...';
+  const {error}=await db.auth.updateUser({password});
+  if(error){
+    status.textContent='Error: '+error.message;
+    return;
+  }
+  status.textContent='✅ Contraseña actualizada.';
+  document.getElementById('newPassword').value='';
+  document.getElementById('confirmNewPassword').value='';
+  setTimeout(()=>{
+    closeModal('passwordResetModal');
+    refreshAuthUI();
+  },700);
+}
+
 async function signOutCloud(){
   await db.auth.signOut();
   cloudProjectId=null;
@@ -798,6 +890,7 @@ let currentQuoteSaved = false;
 
 function markQuoteUnsaved(){
   currentQuoteSaved = false;
+  scheduleTempSave();
   const b=document.getElementById('saveStateBadge');
   if(b){
     b.textContent='Sin guardar';
@@ -918,6 +1011,7 @@ async function searchClients(){
   const term=splitSafe(document.getElementById('clientSearchInput').value);
   const box=document.getElementById('clientSearchResults');
   if(term.length<1){ box.innerHTML='<div class="result-sub">Empieza a escribir para buscar clientes.</div>'; return; }
+  const requestId=++clientSearchRequest;
 
   // Search first name, last name, and phone
   const safe=term.replaceAll(',',' ');
@@ -928,6 +1022,7 @@ async function searchClients(){
     .order('last_name')
     .limit(20);
 
+  if(requestId!==clientSearchRequest) return;
   if(error){ box.innerHTML='<div class="result-sub">Error: '+error.message+'</div>'; return; }
   if(!data?.length){ box.innerHTML='<div class="result-sub">No encontré clientes con ese nombre.</div>'; return; }
 
@@ -948,17 +1043,20 @@ async function toggleClientProjects(client,item){
   if(list.style.display==='block'){ list.style.display='none'; return; }
 
   list.style.display='block';
+  if(list.dataset.loaded==='true') return;
   list.innerHTML='<div class="result-sub">Cargando proyectos...</div>';
 
   const {data,error}=await db.from('projects')
     .select('id,project_name,estimate_number,project_date,created_at')
     .eq('client_id',client.id)
-    .order('created_at',{ascending:false});
+    .order('created_at',{ascending:false})
+    .limit(50);
 
   if(error){ list.innerHTML='<div class="result-sub">Error: '+error.message+'</div>'; return; }
   if(!data?.length){ list.innerHTML='<div class="result-sub">Este cliente todavía no tiene estimates.</div>'; return; }
 
   list.innerHTML='';
+  list.dataset.loaded='true';
   for(const p of data){
     const el=document.createElement('div');
     el.className='project-item';
@@ -1019,9 +1117,12 @@ function newCloudQuote(){
   const hasData =
     (document.getElementById('firstName').value||'').trim() ||
     (document.getElementById('lastName').value||'').trim() ||
+    (document.getElementById('clientPhone').value||'').trim() ||
     (document.getElementById('project').value||'').trim() ||
+    (document.getElementById('laborPrice').value||'').trim() ||
+    (document.getElementById('contingency').value||'').trim() ||
     slabs.some(s => String(s.name||'').trim() || String(s.length||'').trim() || String(s.width||'').trim() || String(s.price||'').trim()) ||
-    pieces.length || extras.length;
+    pieces.some(p => String(p.length||'').trim()) || extras.length;
 
   if(hasData && !currentQuoteSaved){
     const ok=confirm('¿Crear una nueva cotización? Los datos que no hayas guardado se borrarán de la pantalla.');
@@ -1090,7 +1191,14 @@ renderSlabs();
 renderPieces();
 renderExtras();
 calculate();
-db.auth.onAuthStateChange(()=>refreshAuthUI());
+db.auth.onAuthStateChange((event)=>{
+  if(event==='PASSWORD_RECOVERY'){
+    closeModal('loginModal');
+    openModal('passwordResetModal');
+    setTimeout(()=>document.getElementById('newPassword').focus(),100);
+  }
+  setTimeout(refreshAuthUI,0);
+});
 setTimeout(refreshAuthUI,0);
 
 </script>
