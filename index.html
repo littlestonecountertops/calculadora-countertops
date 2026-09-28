@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Little Stone Countertops - Calculadora v3.7 Cloud</title>
+<title>Little Stone Countertops - Calculadora v3.8.2 Cloud</title>
 <style>
 :root{
   --bg:#f4f5f7; --card:#ffffff; --line:#e4e7ec; --text:#16181d; --muted:#667085;
@@ -45,6 +45,13 @@ input:focus,select:focus{border-color:#8b7cf6;box-shadow:0 0 0 2px rgba(108,92,2
 .matbtn small{display:block;font-weight:500;margin-top:4px}
 .matbtn.active{border-color:var(--purple2);box-shadow:0 0 0 2px rgba(123,97,255,.10);background:#faf9ff}
 .pieces-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.piece-area-input{min-width:138px}
+.bs-control{display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+.bs-check{width:18px!important;height:18px!important;min-height:18px!important;flex:0 0 auto}
+.bs-measure{display:none;align-items:center;gap:3px;font-size:11px;color:#475467}
+.bs-measure.show{display:flex}
+.bs-height{width:58px!important;min-height:34px!important;padding:5px 6px!important;text-align:right}
+.pieces-bottom-mobile{display:none;justify-content:flex-end;margin-top:10px}
 .btn{border:0;border-radius:8px;padding:9px 12px;font-weight:700;cursor:pointer}
 .btn.purple{background:linear-gradient(90deg,#6c5ce7,#7b61ff);color:#fff}
 .btn.green{background:#16803a;color:#fff}
@@ -207,6 +214,8 @@ input:disabled{background:#f2f4f7;color:#667085}
   .cloud-meta,.grid4,.grid2{grid-template-columns:1fr}
   .pieces-head{align-items:center;gap:8px}
   .pieces-head .btn{min-height:42px;flex:0 0 auto}
+  .pieces-bottom-mobile{display:flex}
+  .pieces-bottom-mobile .btn{min-height:46px}
   input,select{min-height:44px;font-size:16px}
   td input,td select,.extras-table input,.extras-table select{font-size:16px;min-height:42px}
   .summary-row{padding:11px 9px}
@@ -231,7 +240,7 @@ input:disabled{background:#f2f4f7;color:#667085}
   .slabs-table tbody td::before,.pieces-table tbody td::before,.extras-table tbody td::before{font-size:11px;font-weight:800;color:#667085}
   .slabs-table td:nth-child(1)::before,.pieces-table td:nth-child(1)::before{content:"#"}
   .slabs-table td:nth-child(2)::before{content:"Material"}.slabs-table td:nth-child(3)::before{content:"Largo (in)"}.slabs-table td:nth-child(4)::before{content:"Ancho (in)"}.slabs-table td:nth-child(5)::before{content:"Cantidad"}.slabs-table td:nth-child(6)::before{content:"Costo $/sqft"}.slabs-table td:nth-child(7)::before{content:"Recargo %"}.slabs-table td:nth-child(8)::before{content:"SQFT c/u"}.slabs-table td:nth-child(9)::before{content:"SQFT total"}.slabs-table td:nth-child(10)::before{content:"Costo final"}.slabs-table td:nth-child(11)::before{content:"Acciones"}
-  .pieces-table td:nth-child(2)::before{content:"Área"}.pieces-table td:nth-child(3)::before{content:"Tipo"}.pieces-table td:nth-child(4)::before{content:"Largo (in)"}.pieces-table td:nth-child(5)::before{content:"Ancho (in)"}.pieces-table td:nth-child(6)::before{content:"B/S 4 in"}.pieces-table td:nth-child(7)::before{content:"Top sqft"}.pieces-table td:nth-child(8)::before{content:"B/S sqft"}.pieces-table td:nth-child(9)::before{content:"Total sqft"}.pieces-table td:nth-child(10)::before{content:"Acciones"}
+  .pieces-table td:nth-child(2)::before{content:"Área"}.pieces-table td:nth-child(3)::before{content:"Tipo"}.pieces-table td:nth-child(4)::before{content:"Largo (in)"}.pieces-table td:nth-child(5)::before{content:"Ancho (in)"}.pieces-table td:nth-child(6)::before{content:"B/S y altura"}.pieces-table td:nth-child(7)::before{content:"Top sqft"}.pieces-table td:nth-child(8)::before{content:"B/S sqft"}.pieces-table td:nth-child(9)::before{content:"Total sqft"}.pieces-table td:nth-child(10)::before{content:"Acciones"}
   .extras-table td:nth-child(1)::before{content:"Servicio"}.extras-table td:nth-child(2)::before{content:"Descripción"}.extras-table td:nth-child(3)::before{content:"Cantidad"}.extras-table td:nth-child(4)::before{content:"Precio unit."}.extras-table td:nth-child(5)::before{content:"Total"}.extras-table td:nth-child(6)::before{content:"Acciones"}
 }
 </style>
@@ -242,7 +251,7 @@ input:disabled{background:#f2f4f7;color:#667085}
 
   <div class="topbar">
     <div class="brand">LITTLE STONE<small>COUNTERTOPS</small></div>
-    <div class="title">Calculadora v3.7 Cloud</div>
+    <div class="title">Calculadora v3.8.2 Cloud</div>
     <div class="top-actions">
       <span id="saveStateBadge" class="save-state unsaved" title="Estado de la cotización">● Sin guardar</span>
       <button class="newquote-btn" onclick="newCloudQuote()" title="Nueva cotización">➕ <span class="desktop-label">Nueva cotización</span><span class="mobile-label">Nueva</span></button>
@@ -289,23 +298,25 @@ input:disabled{background:#f2f4f7;color:#667085}
     </div>
   </section>
 
-  <section class="card">
+  <section class="card" id="piecesSection">
     <div class="pieces-head">
       <div class="section-title" style="margin:0">▣ 1. PIEZAS</div>
-      <button class="btn purple" onclick="addPiece()">＋ Agregar pieza</button>
+      <button class="btn purple" id="addPieceTop" onclick="addPiece()">＋ Agregar pieza</button>
     </div>
     <div class="table-wrap">
       <table class="pieces-table">
         <thead>
-          <tr><th>#</th><th>Nombre / área</th><th>Tipo</th><th>Largo (in)</th><th>Ancho (in)</th><th>B/S 4"</th><th>Top sqft</th><th>B/S sqft</th><th>Total sqft</th><th>Acciones</th></tr>
+          <tr><th>#</th><th>Nombre / área</th><th>Tipo</th><th>Largo (in)</th><th>Ancho (in)</th><th>B/S y altura</th><th>Top sqft</th><th>B/S sqft</th><th>Total sqft</th><th>Acciones</th></tr>
         </thead>
         <tbody id="piecesBody"></tbody>
         <tfoot>
-          <tr><td colspan="6" class="num">Total piezas:</td><td id="topSqftTotal">0.00</td><td id="bsSqftTotal">0.00</td><td id="totalSqft">0.00 sqft</td><td></td></tr>
+          <tr><td colspan="6" class="num">Total piezas:</td><td id="topSqftTotal">0.00</td><td id="bsSqftTotal">0.00</td><td id="totalSqft">0.00 sqft</td><td><button class="btn purple" onclick="addPiece()">＋ Agregar pieza</button></td></tr>
         </tfoot>
       </table>
     </div>
+    <div class="pieces-bottom-mobile"><button class="btn purple" onclick="addPiece()">＋ Agregar pieza</button></div>
   </section>
+  <datalist id="areaOptionsList"></datalist>
 
   <div class="grid2">
     <section class="card">
@@ -431,8 +442,22 @@ const areaOptions = [
   "Pantry",
   "Office",
   "Fireplace",
-  "Custom / Otro"
+  "Full High",
+  "Island",
+  "Bonk Bath",
+  "Bathroom"
 ];
+
+function renderAreaOptions(){
+  const list=document.getElementById('areaOptionsList');
+  if(!list) return;
+  list.innerHTML='';
+  areaOptions.forEach(name=>{
+    const option=document.createElement('option');
+    option.value=name;
+    list.appendChild(option);
+  });
+}
 
 let slabs = [
   {name:'', length:'', width:'', qty:'', price:'', markup:''}
@@ -473,9 +498,9 @@ function removeSlab(i){
 }
 
 let pieces = [
-  {area:"Kitchen", customArea:"", type:"kitchen", length:'', width:26, backsplash:true},
-  {area:"Master Bath", customArea:"", type:"bathroom", length:'', width:23, backsplash:true},
-  {area:"Main Bath", customArea:"", type:"bathroom", length:'', width:23, backsplash:true}
+  {area:"Kitchen", type:"kitchen", length:'', width:26, backsplash:true, backsplashHeight:4},
+  {area:"Master Bath", type:"bathroom", length:'', width:23, backsplash:true, backsplashHeight:4},
+  {area:"Main Bath", type:"bathroom", length:'', width:23, backsplash:true, backsplashHeight:4}
 ];
 
 const EXTRA_OPTIONS = [
@@ -504,7 +529,8 @@ function extraDisplayName(e){
 }
 
 function pieceDisplayName(p){
-  return p.area==="Custom / Otro" ? ((p.customArea||"").trim() || "Custom") : (p.area||"");
+  if(p.area==="Custom / Otro") return (p.customArea||"").trim();
+  return (p.area || p.customArea || "").trim();
 }
 
 const moneyFormatter = new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'});
@@ -529,16 +555,14 @@ function renderPieces(){
   body.innerHTML = "";
   pieces.forEach((p,i)=>{
     if(!p.type) p.type = "custom";
-    if(typeof p.customArea === "undefined") p.customArea = "";
-    if(p.area && !areaOptions.includes(p.area)){
-      p.customArea = p.area;
-      p.area = "Custom / Otro";
-    }
+    if(p.area==="Custom / Otro") p.area=(p.customArea||"").trim();
+    if(!p.area && p.customArea) p.area=(p.customArea||"").trim();
+    delete p.customArea;
     if(typeof p.backsplash === "undefined") p.backsplash = false;
+    if(!(Number(p.backsplashHeight)>0)) p.backsplashHeight=4;
     if(p.type==="kitchen") p.width=26;
     if(p.type==="bathroom") p.width=23;
 
-    const opts = areaOptions.map(o=>`<option ${o===p.area?'selected':''}>${o}</option>`).join('');
     const typeOpts = `
       <option value="kitchen" ${p.type==="kitchen"?'selected':''}>Kitchen Standard</option>
       <option value="bathroom" ${p.type==="bathroom"?'selected':''}>Bathroom Standard</option>
@@ -548,18 +572,21 @@ function renderPieces(){
     tr.innerHTML = `
       <td>${i+1}</td>
       <td>
-        <select onchange="pieces[${i}].area=this.value;if(this.value!=='Custom / Otro')pieces[${i}].customArea='';renderPieces();calculate();markQuoteUnsaved()">${opts}</select>
-        ${p.area==="Custom / Otro" ? `<input type="text" style="margin-top:6px" value="${p.customArea ?? ''}" placeholder="Escribe el nombre" oninput="pieces[${i}].customArea=this.value;markQuoteUnsaved()">` : ''}
+        <input class="piece-area-input" list="areaOptionsList" placeholder="Nombre del área" oninput="pieces[${i}].area=this.value;markQuoteUnsaved()">
       </td>
       <td><select onchange="changePieceType(${i},this.value)">${typeOpts}</select></td>
       <td><input type="number" step="0.01" value="${p.length ?? ''}" oninput="pieces[${i}].length=this.value;calculate()"></td>
       <td><input type="number" step="0.01" value="${p.width}" ${p.type!=="custom"?'disabled':''} oninput="pieces[${i}].width=this.value;calculate()"></td>
-      <td style="text-align:center"><input type="checkbox" ${p.backsplash?'checked':''} onchange="pieces[${i}].backsplash=this.checked;calculate()" style="width:18px;height:18px"></td>
+      <td><div class="bs-control">
+        <input class="bs-check" type="checkbox" ${p.backsplash?'checked':''} onchange="pieces[${i}].backsplash=this.checked;if(this.checked && !(Number(pieces[${i}].backsplashHeight)>0))pieces[${i}].backsplashHeight=4;this.parentElement.querySelector('.bs-measure').classList.toggle('show',this.checked);calculate();markQuoteUnsaved()">
+        <span class="bs-measure ${p.backsplash?'show':''}"><input class="bs-height" type="number" min="0.01" step="0.01" value="${p.backsplashHeight}" aria-label="Altura de backsplash en pulgadas" oninput="pieces[${i}].backsplashHeight=this.value;calculate();markQuoteUnsaved()"><span>in</span></span>
+      </div></td>
       <td id="top-${i}">0.00</td>
       <td id="bs-${i}">0.00</td>
       <td id="sqft-${i}">0.00</td>
       <td><div class="actions"><button class="smallbtn del" onclick="removePiece(${i})">🗑</button></div></td>
     `;
+    tr.querySelector('.piece-area-input').value=pieceDisplayName(p);
     body.appendChild(tr);
   });
   calculate();
@@ -569,15 +596,26 @@ function changePieceType(i,type){
   if(type==="kitchen"){
     pieces[i].width=26;
     pieces[i].backsplash=true;
+    if(!(Number(pieces[i].backsplashHeight)>0)) pieces[i].backsplashHeight=4;
     if(!pieces[i].area || pieces[i].area==="Other") pieces[i].area="Kitchen";
   }else if(type==="bathroom"){
     pieces[i].width=23;
     pieces[i].backsplash=true;
+    if(!(Number(pieces[i].backsplashHeight)>0)) pieces[i].backsplashHeight=4;
     if(!pieces[i].area || pieces[i].area==="Kitchen" || pieces[i].area==="Other") pieces[i].area="Master Bathroom";
   }
   renderPieces();
 }
-function addPiece(){ pieces.push({area:"Kitchen",type:"kitchen",length:0,width:26,backsplash:true}); renderPieces(); }
+function addPiece(){
+  pieces.push({area:"Kitchen",type:"kitchen",length:'',width:26,backsplash:true,backsplashHeight:4});
+  renderPieces();
+  markQuoteUnsaved();
+  requestAnimationFrame(()=>{
+    const fields=document.querySelectorAll('.piece-area-input');
+    const field=fields[fields.length-1];
+    if(field){ field.scrollIntoView({behavior:'smooth',block:'center'}); field.focus(); field.select(); }
+  });
+}
 function removePiece(i){ pieces.splice(i,1); renderPieces(); }
 
 function renderExtras(){
@@ -702,7 +740,8 @@ function calculateNow(){
   let totalBsSq = 0;
   pieces.forEach((p,i)=>{
     const topSq = sqft(p.length,p.width);
-    const bsSq = p.backsplash ? sqft(p.length,4) : 0;
+    const bsHeight = Number(p.backsplashHeight)>0 ? Number(p.backsplashHeight) : 4;
+    const bsSq = p.backsplash ? sqft(p.length,bsHeight) : 0;
     const s = topSq + bsSq;
     totalTopSq += topSq;
     totalBsSq += bsSq;
@@ -822,7 +861,7 @@ function resetAll(){
   document.getElementById('materialMarkup').value=10;
   document.getElementById('laborPrice').value=35;
   document.getElementById('contingency').value=10;
-  pieces=[{area:"Kitchen",type:"kitchen",length:0,width:26,backsplash:true}];
+  pieces=[{area:"Kitchen",type:"kitchen",length:0,width:26,backsplash:true,backsplashHeight:4}];
   extras=extras.map(e=>({...e,qty:1,price:0}));
   renderPieces();renderExtras();
 }
@@ -989,9 +1028,9 @@ function clearQuoteForNext(){
 
   slabs=[{name:'',length:'',width:'',qty:'',price:'',markup:''}];
   pieces=[
-    {area:"Kitchen", customArea:"", type:"kitchen", length:'', width:26, backsplash:true},
-    {area:"Master Bath", customArea:"", type:"bathroom", length:'', width:23, backsplash:true},
-    {area:"Main Bath", customArea:"", type:"bathroom", length:'', width:23, backsplash:true}
+    {area:"Kitchen", type:"kitchen", length:'', width:26, backsplash:true, backsplashHeight:4},
+    {area:"Master Bath", type:"bathroom", length:'', width:23, backsplash:true, backsplashHeight:4},
+    {area:"Main Bath", type:"bathroom", length:'', width:23, backsplash:true, backsplashHeight:4}
   ];
   extras=[];
   cloudProjectId=null;
@@ -1304,6 +1343,7 @@ document.addEventListener('keydown', function(e){
   }
 });
 
+renderAreaOptions();
 renderSlabs();
 renderPieces();
 renderExtras();
